@@ -1,101 +1,188 @@
-import Image from "next/image";
+'use client';
+import { useAuth } from './contexts/AuthContext';
+import AuthComponent from './components/Auth';
+import { useState } from 'react';
+
+const MiniMonth = ({ month, monthIndex, year, drinkData }) => {  // Added drinkData prop
+  const startDay = getFirstDayOfMonth(monthIndex, year);
+  const daysInMonth = getDaysInMonth(monthIndex, year);
+  
+  return (
+    <div className="p-2">
+      <span className="text-xs font-medium block mb-1">{month}</span>
+      <div className="grid grid-cols-7 gap-y-[2px]">
+        {/* Day labels */}
+        <div className="text-black text-[6px] text-center">S</div>
+        <div className="text-black text-[6px] text-center">M</div>
+        <div className="text-black text-[6px] text-center">T</div>
+        <div className="text-black text-[6px] text-center">W</div>
+        <div className="text-black text-[6px] text-center">T</div>
+        <div className="text-black text-[6px] text-center">F</div>
+        <div className="text-black text-[6px] text-center">S</div>
+
+        {/* Empty cells */}
+        {[...Array(startDay)].map((_, i) => (
+          <div key={`empty-${i}`} className="w-[8px] h-[8px]"></div>
+        ))}
+        
+        {/* Calendar days with spacing and colors */}
+        {[...Array(daysInMonth)].map((_, i) => {
+          const day = i + 1;
+          const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const drinkCount = drinkData[dateStr];
+          
+          return (
+            <div
+              key={i + 1}
+              onClick={() => onDayClick(dateStr)}
+              className="w-[8px] h-[8px] cursor-pointer"
+            >
+              <div className={`w-full h-full ${getColorForCount(drinkCount)}`}></div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Helper functions 
+const getDaysInMonth = (month, year) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+const getFirstDayOfMonth = (month, year) => {
+  return new Date(year, month, 1).getDay();
+};
+
+const getColorForCount = (count) => {
+  if (count === undefined) return 'bg-gray-200';
+  if (count >= 10) return 'bg-black';
+  if (count >= 7) return 'bg-red-500';
+  if (count >= 4) return 'bg-orange-300';
+  if (count >= 2) return 'bg-yellow-200';
+  if (count >= 0) return 'bg-green-300';
+  return 'bg-gray-100';
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { user } = useAuth();
+  // If no user is logged in, show auth component
+  if (!user) {
+    return <AuthComponent />;
+  }
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const currentYear = new Date().getFullYear();
+  const [drinkData, setDrinkData] = useState({});
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  const handleDayClick = (date) => {
+    const count = prompt('Enter number of drinks:');
+    if (count === null) return;
+    
+    const numCount = parseInt(count);
+    if (isNaN(numCount) || numCount < 0) {
+      alert('Please enter a valid positive number');
+      return;
+    }
+
+    setDrinkData(prev => ({
+      ...prev,
+      [date]: numCount
+    }));
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      <main className="w-3/4 p-8 overflow-y-auto">
+        <h1 className="text-2xl font-bold mb-6">{currentYear} Drink Tracker</h1>
+        
+        {months.map((month, monthIndex) => (
+          <div key={month} className="bg-white rounded-lg shadow p-4 mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-black">{month}</h2>
+            <div className="grid grid-cols-7 gap-1">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="text-center font-semibold p-2 text-sm text-black">
+                  {day}
+                </div>
+              ))}
+              
+              {[...Array(getFirstDayOfMonth(monthIndex, currentYear))].map((_, i) => (
+                <div key={`empty-${i}`} className="p-2"></div>
+              ))}
+              
+              {[...Array(getDaysInMonth(monthIndex, currentYear))].map((_, i) => {
+                const day = i + 1;
+                const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const drinkCount = drinkData[dateStr];
+                
+                return (
+                  <div
+                    key={day}
+                    onClick={() => handleDayClick(dateStr)}
+                    className={`aspect-square border text-center hover:bg-gray-50 cursor-pointer relative group ${getColorForCount(drinkCount)}`}
+                  >
+                    <span className="absolute top-1 left-1 text-black text-[16px]">
+                      {day}
+                    </span>
+                    {/* Tooltip on hover */}
+                    {drinkCount !== undefined && (
+                      <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white transition-opacity">
+                        {drinkCount}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      <aside className="w-1/4 p-4 fixed right-0 top-0 h-screen bg-gray-50 flex flex-col">
+        <h2 className="text-lg font-bold mb-4 text-black">{currentYear} Overview</h2>
+        <div className="grid grid-cols-3 gap-2 auto-rows-min text-black">
+          {months.map((month, index) => (
+            <MiniMonth 
+              key={month}
+              month={month}
+              monthIndex={index}
+              year={currentYear}
+              drinkData={drinkData}  // Pass drinkData to MiniMonth
+            />
+          ))}
+        </div>
+        {/* Legend stays the same */}
+        <div className="mt-4 text-xs text-black">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 bg-gray-200"></div>
+            <span>N/A</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1 text-black">
+            <div className="w-3 h-3 bg-green-300"></div>
+            <span>0-1 drinks</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1 text-black">
+            <div className="w-3 h-3 bg-yellow-200"></div>
+            <span>2-3 drinks</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1 text-black">
+            <div className="w-3 h-3 bg-orange-300"></div>
+            <span>4-6 drinks</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1 text-black">
+            <div className="w-3 h-3 bg-red-500"></div>
+            <span>7-10</span>
+          </div>
+          <div className="flex items-center gap-2 text-black">
+            <div className="w-3 h-3 bg-black"></div>
+            <span>10+</span>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }
