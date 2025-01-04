@@ -4,7 +4,7 @@ import AuthComponent from './components/Auth';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 
-// Keep your existing helper functions
+// Helper functions
 const getDaysInMonth = (month, year) => {
   return new Date(year, month + 1, 0).getDate();
 };
@@ -23,7 +23,7 @@ const getColorForCount = (count) => {
   return 'bg-gray-100';
 };
 
-// Keep your MiniMonth component
+// MiniMonth component
 const MiniMonth = ({ month, monthIndex, year, drinkData }) => {
   const startDay = getFirstDayOfMonth(monthIndex, year);
   const daysInMonth = getDaysInMonth(monthIndex, year);
