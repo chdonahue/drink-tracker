@@ -1,9 +1,30 @@
 'use client';
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from './lib/supabase';
 
-const MiniMonth = ({ month, monthIndex, year, drinkData }) => {  // Added drinkData prop
+// Keep your existing helper functions
+const getDaysInMonth = (month, year) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+const getFirstDayOfMonth = (month, year) => {
+  return new Date(year, month, 1).getDay();
+};
+
+const getColorForCount = (count) => {
+  if (count === undefined) return 'bg-gray-200';
+  if (count >= 10) return 'bg-black';
+  if (count >= 7) return 'bg-red-500';
+  if (count >= 4) return 'bg-orange-300';
+  if (count >= 2) return 'bg-yellow-200';
+  if (count >= 0) return 'bg-green-300';
+  return 'bg-gray-100';
+};
+
+// Keep your MiniMonth component
+const MiniMonth = ({ month, monthIndex, year, drinkData }) => {
   const startDay = getFirstDayOfMonth(monthIndex, year);
   const daysInMonth = getDaysInMonth(monthIndex, year);
   
@@ -34,7 +55,6 @@ const MiniMonth = ({ month, monthIndex, year, drinkData }) => {  // Added drinkD
           return (
             <div
               key={i + 1}
-              onClick={() => onDayClick(dateStr)}
               className="w-[8px] h-[8px] cursor-pointer"
             >
               <div className={`w-full h-full ${getColorForCount(drinkCount)}`}></div>
@@ -46,40 +66,47 @@ const MiniMonth = ({ month, monthIndex, year, drinkData }) => {  // Added drinkD
   );
 };
 
-// Helper functions 
-const getDaysInMonth = (month, year) => {
-  return new Date(year, month + 1, 0).getDate();
-};
-
-const getFirstDayOfMonth = (month, year) => {
-  return new Date(year, month, 1).getDay();
-};
-
-const getColorForCount = (count) => {
-  if (count === undefined) return 'bg-gray-200';
-  if (count >= 10) return 'bg-black';
-  if (count >= 7) return 'bg-red-500';
-  if (count >= 4) return 'bg-orange-300';
-  if (count >= 2) return 'bg-yellow-200';
-  if (count >= 0) return 'bg-green-300';
-  return 'bg-gray-100';
-};
-
 export default function Home() {
   const { user } = useAuth();
-  // If no user is logged in, show auth component
-  if (!user) {
-    return <AuthComponent />;
-  }
+  const [drinkData, setDrinkData] = useState({});
+  const [loading, setLoading] = useState(true);
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
-  
   const currentYear = new Date().getFullYear();
-  const [drinkData, setDrinkData] = useState({});
 
-  const handleDayClick = (date) => {
+  // Fetch existing data when component loads
+  useEffect(() => {
+    if (user) {
+      fetchDrinkData();
+    }
+  }, [user]);
+
+  const fetchDrinkData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('drinks')
+        .select('date, count')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Convert array of records to object format
+      const formattedData = {};
+      data.forEach(record => {
+        formattedData[record.date] = record.count;
+      });
+
+      setDrinkData(formattedData);
+    } catch (error) {
+      console.error('Error fetching drink data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDayClick = async (date) => {
     const count = prompt('Enter number of drinks:');
     if (count === null) return;
     
@@ -89,12 +116,39 @@ export default function Home() {
       return;
     }
 
-    setDrinkData(prev => ({
-      ...prev,
-      [date]: numCount
-    }));
+    try {
+      const { error } = await supabase
+        .from('drinks')
+        .upsert({ 
+          user_id: user.id,
+          date: date,
+          count: numCount
+        }, {
+          onConflict: 'user_id,date'
+        });
+
+      if (error) throw error;
+
+      // Update local state after successful save
+      setDrinkData(prev => ({
+        ...prev,
+        [date]: numCount
+      }));
+    } catch (error) {
+      console.error('Error saving drink count:', error);
+      alert('Failed to save drink count. Please try again.');
+    }
   };
 
+  if (!user) {
+    return <AuthComponent />;
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  // Your existing return statement
   return (
     <div className="min-h-screen flex">
       <main className="w-3/4 p-8 overflow-y-auto">
@@ -151,11 +205,11 @@ export default function Home() {
               month={month}
               monthIndex={index}
               year={currentYear}
-              drinkData={drinkData}  // Pass drinkData to MiniMonth
+              drinkData={drinkData}
             />
           ))}
         </div>
-        {/* Legend stays the same */}
+        {/* Legend */}
         <div className="mt-4 text-xs text-black">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-3 h-3 bg-gray-200"></div>
