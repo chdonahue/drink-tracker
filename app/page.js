@@ -148,12 +148,19 @@ export default function Home() {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  // Your existing return statement
   return (
     <div className="min-h-screen flex">
-      <main className="w-3/4 p-8 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-6">{currentYear} Drink Tracker</h1>
+       <main className="w-3/4 p-8 overflow-y-auto">
         
+       <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">{currentYear} Drink Tracker</h1>
+          <a href="https://www.buymeacoffee.com/donahuechrw" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-yellow-500 text-black font-medium rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2">
+            <span className="text-xl">☕</span>
+            <span>Buy me a coffee</span>
+          </a>
+        </div>
+        
+      
         {months.map((month, monthIndex) => (
           <div key={month} className="bg-white rounded-lg shadow p-4 mb-8">
             <h2 className="text-xl font-semibold mb-4 text-black">{month}</h2>
