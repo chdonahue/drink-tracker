@@ -197,7 +197,17 @@ export default function Home() {
       </main>
 
       <aside className="w-1/4 p-4 fixed right-0 top-0 h-screen bg-gray-50 flex flex-col">
-        <h2 className="text-lg font-bold mb-4 text-black">{currentYear} Overview</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold text-black">{currentYear} Overview</h2>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+            }}
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
         <div className="grid grid-cols-3 gap-2 auto-rows-min text-black">
           {months.map((month, index) => (
             <MiniMonth 
