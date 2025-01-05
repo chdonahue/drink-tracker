@@ -213,7 +213,7 @@ export default function Home() {
         legendElement.classList.remove('invisible');
       }
       
-      const filename = `${month}_${currentYear}.jpg`;
+      const filename = `${month}.jpg`;
       await exportToJpg(monthElement, filename);
       
       if (legendElement) {
