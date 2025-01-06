@@ -1,4 +1,5 @@
 'use client';
+import TestComponent from './components/TestComponent';
 import MiniMonth from './components/MiniMonth'; 
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
