@@ -1,5 +1,5 @@
 'use client';
-import MiniMonth from '@/components/MiniMonth'; 
+import MiniMonth from './components/MiniMonth'; 
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
 import { useState, useEffect, useRef } from 'react';
