@@ -1,4 +1,5 @@
 'use client';
+import MiniMonth from '@/components/MiniMonth';
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
 import { useState, useEffect, useRef } from 'react';
@@ -46,47 +47,47 @@ const exportToJpg = async (element, filename) => {
 };
 
 // MiniMonth component
-const MiniMonth = ({ month, monthIndex, year, drinkData }) => {
-  const startDay = getFirstDayOfMonth(monthIndex, year);
-  const daysInMonth = getDaysInMonth(monthIndex, year);
+// const MiniMonth = ({ month, monthIndex, year, drinkData }) => {
+//   const startDay = getFirstDayOfMonth(monthIndex, year);
+//   const daysInMonth = getDaysInMonth(monthIndex, year);
   
-  return (
-    <div className="p-2">
-      <span className="text-xs font-medium block mb-1">{month}</span>
-      <div className="grid grid-cols-7 gap-[1px]">
-        {/* Day labels */}
-        <div className="text-black text-[5px] text-center">S</div>
-        <div className="text-black text-[5px] text-center">M</div>
-        <div className="text-black text-[5px] text-center">T</div>
-        <div className="text-black text-[5px] text-center">W</div>
-        <div className="text-black text-[5px] text-center">T</div>
-        <div className="text-black text-[5px] text-center">F</div>
-        <div className="text-black text-[5px] text-center">S</div>
+//   return (
+//     <div className="p-2">
+//       <span className="text-xs font-medium block mb-1">{month}</span>
+//       <div className="grid grid-cols-7 gap-[1px]">
+//         {/* Day labels */}
+//         <div className="text-black text-[5px] text-center">S</div>
+//         <div className="text-black text-[5px] text-center">M</div>
+//         <div className="text-black text-[5px] text-center">T</div>
+//         <div className="text-black text-[5px] text-center">W</div>
+//         <div className="text-black text-[5px] text-center">T</div>
+//         <div className="text-black text-[5px] text-center">F</div>
+//         <div className="text-black text-[5px] text-center">S</div>
 
-        {/* Empty cells */}
-        {[...Array(startDay)].map((_, i) => (
-          <div key={`empty-${i}`} className="w-[6px] h-[6px]"></div>
-        ))}
+//         {/* Empty cells */}
+//         {[...Array(startDay)].map((_, i) => (
+//           <div key={`empty-${i}`} className="w-[6px] h-[6px]"></div>
+//         ))}
         
-        {/* Calendar days with spacing and colors */}
-        {[...Array(daysInMonth)].map((_, i) => {
-          const day = i + 1;
-          const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          const drinkCount = drinkData[dateStr];
+//         {/* Calendar days with spacing and colors */}
+//         {[...Array(daysInMonth)].map((_, i) => {
+//           const day = i + 1;
+//           const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+//           const drinkCount = drinkData[dateStr];
           
-          return (
-            <div
-              key={i + 1}
-              className="w-[6px] h-[6px] cursor-pointer"
-            >
-              <div className={`w-full h-full ${getColorForCount(drinkCount)}`}></div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
+//           return (
+//             <div
+//               key={i + 1}
+//               className="w-[6px] h-[6px] cursor-pointer"
+//             >
+//               <div className={`w-full h-full ${getColorForCount(drinkCount)}`}></div>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// };
 
 const MonthExport = React.forwardRef(({ month, children, isVisible }, ref) => {
   return (
@@ -133,6 +134,11 @@ export default function Home() {
   const months = [
     'January 2025', 'February 2025', 'March 2025', 'April 2025', 'May 2025', 'June 2025',
     'July 2025', 'August 2025', 'September 2025', 'October 2025', 'November 2025', 'December 2025'
+  ];
+
+  const miniMonths = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
   const currentYear = new Date().getFullYear();
 
@@ -331,7 +337,7 @@ export default function Home() {
         </div>
         <div ref={yearRef} className="bg-white p-4 rounded-lg">
           <div className="grid grid-cols-3 gap-2 auto-rows-min text-black">
-            {months.map((month, index) => (
+            {miniMonths.map((month, index) => (
               <MiniMonth 
                 key={month}
                 month={month}
@@ -357,11 +363,11 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2 mb-1 text-black">
               <div className="w-3 h-3 bg-red-500"></div>
-              <span>6-9</span>
+              <span>6-9 drinks</span>
             </div>
             <div className="flex items-center gap-2 text-black">
               <div className="w-3 h-3 bg-neutral-700"></div>
-              <span>10+</span>
+              <span>10+ drinks</span>
             </div>
           </div>
         </div>
