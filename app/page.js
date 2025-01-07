@@ -90,34 +90,62 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Drink Tracker</h1>
-        <div className="flex gap-4">
-          <a 
-            href="https://www.buymeacoffee.com/donahuechrw" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="px-4 py-2 bg-yellow-500 text-black font-medium rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
-          >
-            <span className="text-xl">☕</span>
-            <span>Buy me a coffee</span>
-          </a>
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-            }}
-            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-          >
-            Sign Out
-          </button>
+    <div className="min-h-screen flex">
+      <div className="flex-grow p-8 pr-72">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Drink Tracker</h1>
+          <div className="flex gap-4">
+            <a 
+              href="https://www.buymeacoffee.com/donahuechrw" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="px-4 py-2 bg-yellow-500 text-black font-medium rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
+            >
+              <span className="text-xl">☕</span>
+              <span>Buy me a coffee</span>
+            </a>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+              }}
+              className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        <Calendar 
+          drinkData={drinkData} 
+          onDayClick={handleDayClick}
+        />
+      </div>
+
+      <div className="fixed right-0 top-0 w-64 h-screen bg-white shadow-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-black">Legend</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-green-300"></div>
+            <span className="text-black">0 drinks</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-yellow-400"></div>
+            <span className="text-black">1-2 drinks</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-orange-400"></div>
+            <span className="text-black">3-5 drinks</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-red-500"></div>
+            <span className="text-black">6-9 drinks</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-neutral-700"></div>
+            <span className="text-black">10+ drinks</span>
+          </div>
         </div>
       </div>
-      
-      <Calendar 
-        drinkData={drinkData} 
-        onDayClick={handleDayClick}
-      />
     </div>
   );
 }
