@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import MiniMonth from './MiniMonth';
+import MiniMonth from './MiniMonth.js';
 
 const getColorForCount = (count) => {
   if (count === undefined) return 'bg-gray-200';
