@@ -9,10 +9,10 @@ const MiniMonth = ({ month, monthIndex, year, drinkData, getColorForCount }) => 
   
   return (
     <div className="p-2 w-full">
-      <span className="text-[2.5vw] font-medium block mb-1 text-black">{month}</span>
-      <div className="grid grid-cols-7 gap-[2%]">
+      <span className="text-2xl font-medium block mb-1 text-black">{month}</span>
+      <div className="grid grid-cols-7 gap-1">
         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-          <div key={i} className="text-black text-[1.6vw] text-center">{day}</div>
+          <div key={i} className="text-black text-base text-center">{day}</div>
         ))}
 
         {[...Array(startDay)].map((_, i) => (
