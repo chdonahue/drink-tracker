@@ -5,16 +5,6 @@ import Calendar, {getColorForCount} from './components/Calendar';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 
-// const getColorForCount = (count) => {
-//   if (count === undefined) return 'bg-gray-200';
-//   if (count >= 10) return 'bg-neutral-700';
-//   if (count >= 6) return 'bg-red-500';
-//   if (count >= 3) return 'bg-orange-400';
-//   if (count >= 1) return 'bg-yellow-400';
-//   if (count >= 0) return 'bg-green-300';
-//   return 'bg-gray-100';
-// };
-
 export default function Home() {
   const { user } = useAuth();
   const [drinkData, setDrinkData] = useState({});
@@ -48,9 +38,9 @@ export default function Home() {
     }
   };
 
-  const handleDayClick = async (date) => {
+  const handleDayClick = async (date, value) => {
     let numCount = value;
-  
+    
     if (typeof value === 'undefined') {
       const count = prompt('Enter number of drinks:');
       if (count === null) return;
@@ -61,7 +51,7 @@ export default function Home() {
         return;
       }
     }
-
+  
     try {
       const { error } = await supabase
         .from('drinks')
@@ -72,9 +62,9 @@ export default function Home() {
         }, {
           onConflict: 'user_id,date'
         });
-
+  
       if (error) throw error;
-
+  
       setDrinkData(prev => ({
         ...prev,
         [date]: numCount

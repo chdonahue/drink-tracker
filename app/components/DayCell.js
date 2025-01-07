@@ -3,7 +3,7 @@ import getColorForCount from '../utils/colorMapping';
 
 const DayCell = ({ date, count, onValueChange }) => {
     const [touchStart, setTouchStart] = useState(null);
-    const [initialValue, setInitialValue] = useState(count || 0);
+    const [initialValue] = useState(count || 0);
     const [isMobile, setIsMobile] = useState(false);
   
     useEffect(() => {
