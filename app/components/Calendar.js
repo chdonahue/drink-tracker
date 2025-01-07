@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import MiniMonth from './MiniMonth.js';
-
-const getColorForCount = (count) => {
-  if (count === undefined) return 'bg-gray-200';
-  if (count >= 10) return 'bg-neutral-700';
-  if (count >= 6) return 'bg-red-500';
-  if (count >= 3) return 'bg-orange-400';
-  if (count >= 1) return 'bg-yellow-400';
-  if (count >= 0) return 'bg-green-300';
-  return 'bg-gray-100';
-};
+import MiniMonth from './MiniMonth';
+import DayCell from './DayCell';
+import getColorForCount from '../utils/colorMapping';
 
 const Calendar = ({ drinkData, onDayClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -75,24 +67,18 @@ const Calendar = ({ drinkData, onDayClick }) => {
             const drinkCount = drinkData[dateStr];
             
             return (
-              <div
-                key={day}
-                onClick={() => onDayClick(dateStr)}
-                className={`aspect-square border text-center hover:bg-gray-50 cursor-pointer relative group ${getColorForCount(drinkCount)}`}
-              >
-                <span className="absolute top-1 left-1 text-[2vw] text-black">
-                  {day}
-                </span>
-                {drinkCount !== undefined && (
-                  <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white transition-opacity">
-                    <span className="text-[4vw] font-bold">
-                      {drinkCount}
-                    </span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                <div key={day} className="relative">
+                  <span className="absolute top-1 left-1 text-[2vw] text-black z-10">
+                    {day}
+                  </span>
+                  <DayCell 
+                    date={dateStr}
+                    count={drinkCount}
+                    onValueChange={(date, value) => onDayClick(date, value)}
+                  />
+                </div>
+              );
+            })}
         </div>
       </div>
 

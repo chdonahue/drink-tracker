@@ -1,19 +1,19 @@
 'use client';
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
-import Calendar from './components/Calendar';
+import Calendar, {getColorForCount} from './components/Calendar';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 
-const getColorForCount = (count) => {
-  if (count === undefined) return 'bg-gray-200';
-  if (count >= 10) return 'bg-neutral-700';
-  if (count >= 6) return 'bg-red-500';
-  if (count >= 3) return 'bg-orange-400';
-  if (count >= 1) return 'bg-yellow-400';
-  if (count >= 0) return 'bg-green-300';
-  return 'bg-gray-100';
-};
+// const getColorForCount = (count) => {
+//   if (count === undefined) return 'bg-gray-200';
+//   if (count >= 10) return 'bg-neutral-700';
+//   if (count >= 6) return 'bg-red-500';
+//   if (count >= 3) return 'bg-orange-400';
+//   if (count >= 1) return 'bg-yellow-400';
+//   if (count >= 0) return 'bg-green-300';
+//   return 'bg-gray-100';
+// };
 
 export default function Home() {
   const { user } = useAuth();
@@ -49,13 +49,17 @@ export default function Home() {
   };
 
   const handleDayClick = async (date) => {
-    const count = prompt('Enter number of drinks:');
-    if (count === null) return;
-    
-    const numCount = parseInt(count);
-    if (isNaN(numCount) || numCount < 0) {
-      alert('Please enter a valid positive number');
-      return;
+    let numCount = value;
+  
+    if (typeof value === 'undefined') {
+      const count = prompt('Enter number of drinks:');
+      if (count === null) return;
+      
+      numCount = parseInt(count);
+      if (isNaN(numCount) || numCount < 0) {
+        alert('Please enter a valid positive number');
+        return;
+      }
     }
 
     try {
