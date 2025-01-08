@@ -7,6 +7,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const [currentValue, setCurrentValue] = useState(initialValue);
   const [touchStart, setTouchStart] = useState(null);
   const [startValue, setStartValue] = useState(initialValue);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -19,6 +20,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     e.preventDefault();
     setTouchStart(e.touches[0].clientY);
     setStartValue(currentValue);
+    setIsClearing(false);
   };
 
   const handleTouchMove = (e) => {
@@ -29,10 +31,17 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const diff = touchStart - currentTouch;
     const sensitivity = 10;
     const valueChange = Math.floor(diff / sensitivity);
-    const newValue = Math.max(0, startValue + valueChange);
+    const computedValue = startValue + valueChange;
     
-    setCurrentValue(newValue);
-    onValueChange(newValue);
+    if (computedValue < 0) {
+      setIsClearing(true);
+      setCurrentValue(0);
+      onValueChange(null);
+    } else {
+      setIsClearing(false);
+      setCurrentValue(computedValue);
+      onValueChange(computedValue);
+    }
   };
 
   const handleTouchEnd = () => {
@@ -41,9 +50,15 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
 
   const handleTap = (e) => {
     e.stopPropagation(); // Prevent closing the adjuster
-    const newValue = currentValue + 1;
-    setCurrentValue(newValue);
-    onValueChange(newValue);
+    if (isClearing) {
+      setIsClearing(false);
+      setCurrentValue(1);
+      onValueChange(1);
+    } else {
+      const newValue = currentValue + 1;
+      setCurrentValue(newValue);
+      onValueChange(newValue);
+    }
   };
 
   return (
@@ -52,15 +67,22 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
       onClick={onClose}
     >
       <button 
-        className={`w-64 h-64 rounded-xl ${getColorForCount(currentValue)} flex flex-col items-center justify-center`}
+        className={`w-64 h-64 rounded-xl ${isClearing ? 'bg-gray-500' : getColorForCount(currentValue)} 
+          flex flex-col items-center justify-center transition-colors duration-200`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onClick={handleTap}
       >
-        <div className="text-6xl font-bold text-white">{currentValue}</div>
-        <div className="text-white mt-4 opacity-50">Tap to increment</div>
-        <div className="text-white mt-2 opacity-50">Swipe up/down to adjust</div>
+        <div className="text-6xl font-bold text-white">
+          {isClearing ? '—' : currentValue}
+        </div>
+        <div className="text-white mt-4 opacity-50">
+          {isClearing ? 'Release to clear' : 'Tap to increment'}
+        </div>
+        <div className="text-white mt-2 opacity-50">
+          {isClearing ? 'Swipe up to cancel' : 'Swipe up/down to adjust'}
+        </div>
         <div className="text-white mt-2 opacity-50">Tap outside to close</div>
       </button>
     </div>
