@@ -16,6 +16,12 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     };
   }, []);
 
+  const triggerHaptic = (duration = 10) => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(duration);
+    }
+  };
+
   const handleTouchStart = (e) => {
     e.preventDefault();
     setTouchStart(e.touches[0].clientY);
@@ -34,11 +40,23 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const computedValue = startValue + valueChange;
     
     if (computedValue < 0) {
-      setIsClearing(true);
-      setCurrentValue(0);
-      onValueChange(null);
+      if (!isClearing) {
+        // Stronger vibration when entering clearing state
+        triggerHaptic(20);
+        setIsClearing(true);
+        setCurrentValue(0);
+        onValueChange(null);
+      }
     } else {
-      setIsClearing(false);
+      if (isClearing) {
+        // Vibrate when exiting clearing state
+        triggerHaptic(20);
+        setIsClearing(false);
+      }
+      if (computedValue !== currentValue) {
+        // Short vibration for regular value changes
+        triggerHaptic(8);
+      }
       setCurrentValue(computedValue);
       onValueChange(computedValue);
     }
