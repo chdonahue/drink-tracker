@@ -1,3 +1,4 @@
+// BELOW IS THE PREVIOUSLY WORKING VERSION
 // import { useState, useEffect } from 'react';
 // import getColorForCount from '../utils/colorMapping';
 // import ValueAdjuster from './ValueAdjuster';
@@ -5,7 +6,6 @@
 // const DayCell = ({ date, count, onValueChange }) => {
 //   const [isMobile, setIsMobile] = useState(false);
 //   const [isAdjusting, setIsAdjusting] = useState(false);
-//   const MAX_VALUE = 99;
 
 //   useEffect(() => {
 //     const checkMobile = () => {
@@ -25,37 +25,16 @@
 
 //   const handleClick = (e) => {
 //     if (!isMobile) {
-//       const input = prompt('Enter number of drinks (0-99, or clear to reset):', count ?? '');
-      
-//       // Handle cancel
+//       const input = prompt('Enter number of drinks:', count ?? '');
 //       if (input === null) return;
       
-//       // Handle clearing/resetting
-//       if (input.trim().toLowerCase() === 'clear' || input.trim() === '') {
-//         onValueChange(undefined);
-//         return;
-//       }
-      
-//       // Handle numeric input
 //       const numCount = parseInt(input);
-//       // Check if it's a valid number
-//       if (isNaN(numCount)) {
-//         alert('Please enter a number, "clear", or leave empty to reset');
-//         return;
-//       }
-
-//       // Check range
-//       if (numCount > MAX_VALUE) {
-//         alert(`Maximum value is ${MAX_VALUE}`);
-//         return;
-//       }
-
-//       if (numCount < 0) {
-//         alert('Please enter a positive number');
+//       if (isNaN(numCount) || numCount < 0) {
+//         alert('Please enter a valid positive number');
 //         return;
 //       }
       
-//       onValueChange(numCount);
+//       onValueChange(date, numCount);
 //     } else {
 //       setIsAdjusting(true);
 //     }
@@ -79,7 +58,7 @@
 //         <ValueAdjuster
 //           initialValue={count ?? 0}
 //           onValueChange={(value) => {
-//             onValueChange(value);
+//             onValueChange(date, value);
 //           }}
 //           onClose={() => setIsAdjusting(false)}
 //         />
@@ -96,11 +75,19 @@ import getColorForCount from '../utils/colorMapping';
 import ValueAdjuster from './ValueAdjuster';
 
 const DayCell = ({ date, count, onValueChange }) => {
+  // Add a development flag - set to true to force desktop mode
+  const FORCE_DESKTOP = true;  // Add this line
+  
   const [isMobile, setIsMobile] = useState(false);
   const [isAdjusting, setIsAdjusting] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
+      if (FORCE_DESKTOP) {
+        setIsMobile(false);
+        return;
+      }
+      
       const hasTouchScreen = (
         ('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
@@ -117,12 +104,20 @@ const DayCell = ({ date, count, onValueChange }) => {
 
   const handleClick = (e) => {
     if (!isMobile) {
-      const input = prompt('Enter number of drinks:', count ?? '');
+      const input = prompt('Enter number of drinks (or leave blank to clear):', count ?? '');
+      
+      // Handle cancel
       if (input === null) return;
+      
+      /// Clear the cell if input is empty
+      if (input.trim() === '') {
+        onValueChange(date, null);
+        return;
+      }
       
       const numCount = parseInt(input);
       if (isNaN(numCount) || numCount < 0) {
-        alert('Please enter a valid positive number');
+        alert('Please enter a valid positive number or leave blank to clear');
         return;
       }
       

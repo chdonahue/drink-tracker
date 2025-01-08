@@ -51,7 +51,32 @@ export default function Home() {
         return;
       }
     }
+
+    // If value is null, delete the record
+    if (value === null) {
+      try {
+        const { error } = await supabase
+          .from('drinks')
+          .delete()
+          .match({ user_id: user.id, date: date });
+
+        if (error) throw error;
+
+        // Remove the date from local state
+        setDrinkData(prev => {
+          const newData = { ...prev };
+          delete newData[date];
+          return newData;
+        });
+        return;
+      } catch (error) {
+        console.error('Error clearing drink count:', error);
+        alert('Failed to clear drink count. Please try again.');
+      }
+      return;
+    }
   
+    // Handle normal case (setting a value)
     try {
       const { error } = await supabase
         .from('drinks')
