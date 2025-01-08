@@ -10,29 +10,10 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    
-    // Handle volume button presses
-    const handleKeyDown = (e) => {
-      if (e.key === 'VolumeUp' || e.key === 'AudioVolumeUp') {
-        e.preventDefault();
-        const newValue = currentValue + 1;
-        setCurrentValue(newValue);
-        onValueChange(newValue);
-      } else if (e.key === 'VolumeDown' || e.key === 'AudioVolumeDown') {
-        e.preventDefault();
-        const newValue = Math.max(0, currentValue - 1);
-        setCurrentValue(newValue);
-        onValueChange(newValue);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    
     return () => {
       document.body.style.overflow = 'auto';
-      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentValue, onValueChange]);
+  }, []);
 
   const handleTouchStart = (e) => {
     e.preventDefault();
@@ -51,6 +32,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const newValue = Math.max(0, startValue + valueChange);
     
     setCurrentValue(newValue);
+    // Update the parent's value in real-time
     onValueChange(newValue);
   };
 
@@ -72,7 +54,6 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
       >
         <div className="text-6xl font-bold text-white">{currentValue}</div>
         <div className="text-white mt-4 opacity-50">Swipe up/down to adjust</div>
-        <div className="text-white mt-2 opacity-50">Use volume buttons to increment</div>
         <div className="text-white mt-2 opacity-50">Tap outside to close</div>
       </div>
     </div>
