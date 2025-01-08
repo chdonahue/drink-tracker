@@ -41,38 +41,41 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     
     if (computedValue < 0) {
       if (!isClearing) {
-        // Stronger vibration when entering clearing state
         triggerHaptic(20);
         setIsClearing(true);
         setCurrentValue(0);
-        onValueChange(null);
       }
     } else {
       if (isClearing) {
-        // Vibrate when exiting clearing state
         triggerHaptic(20);
         setIsClearing(false);
       }
       if (computedValue !== currentValue) {
-        // Short vibration for regular value changes
         triggerHaptic(8);
       }
       setCurrentValue(computedValue);
-      onValueChange(computedValue);
     }
   };
 
   const handleTouchEnd = () => {
     setTouchStart(null);
+    // Only send the final value when touch ends
+    if (isClearing) {
+      onValueChange(null);
+    } else {
+      onValueChange(currentValue);
+    }
   };
 
   const handleTap = (e) => {
     e.stopPropagation(); // Prevent closing the adjuster
     if (isClearing) {
+      triggerHaptic(20);
       setIsClearing(false);
       setCurrentValue(1);
       onValueChange(1);
     } else {
+      triggerHaptic(8);
       const newValue = currentValue + 1;
       setCurrentValue(newValue);
       onValueChange(newValue);
