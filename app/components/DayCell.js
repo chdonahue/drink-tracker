@@ -102,14 +102,13 @@ const DayCell = ({ date, count, onValueChange }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // We're testing if this now works on mobile for null selection
   const handleClick = (e) => {
     if (!isMobile) {
       const input = prompt('Enter number of drinks (or leave blank to clear):', count ?? '');
+      if (input === null) return;  // User clicked Cancel
       
-      // Handle cancel
-      if (input === null) return;
-      
-      /// Clear the cell if input is empty
+      // Clear the cell if input is empty
       if (input.trim() === '') {
         onValueChange(date, null);
         return;
