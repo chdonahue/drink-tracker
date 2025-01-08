@@ -8,6 +8,14 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [startValue, setStartValue] = useState(initialValue);
 
+  // Prevent scrolling when component mounts
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   const handleTouchStart = (e) => {
     e.preventDefault();
     setTouchStart(e.touches[0].clientY);
@@ -17,6 +25,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const handleTouchMove = (e) => {
     if (!touchStart) return;
     
+    e.preventDefault(); // Prevent scrolling during touch move
     const currentTouch = e.touches[0].clientY;
     const diff = touchStart - currentTouch;
     const sensitivity = 10; // Pixels per value change
@@ -33,7 +42,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center touch-none"
       onClick={onClose}
     >
       <div 
