@@ -35,7 +35,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     e.preventDefault();
     const currentTouch = e.touches[0].clientY;
     const diff = touchStart - currentTouch;
-    const sensitivity = 10;
+    const sensitivity = 5; 
     const valueChange = Math.floor(diff / sensitivity);
     const computedValue = startValue + valueChange;
     
@@ -51,7 +51,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
         setIsClearing(false);
       }
       if (computedValue !== currentValue) {
-        triggerHaptic(8);
+        triggerHaptic(50);
       }
       setCurrentValue(computedValue);
     }
