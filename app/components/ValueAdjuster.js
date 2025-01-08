@@ -32,7 +32,6 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const newValue = Math.max(0, startValue + valueChange);
     
     setCurrentValue(newValue);
-    // Update the parent's value in real-time
     onValueChange(newValue);
   };
 
@@ -40,22 +39,30 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     setTouchStart(null);
   };
 
+  const handleTap = (e) => {
+    e.stopPropagation(); // Prevent closing the adjuster
+    const newValue = currentValue + 1;
+    setCurrentValue(newValue);
+    onValueChange(newValue);
+  };
+
   return (
     <div 
       className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center touch-none"
       onClick={onClose}
     >
-      <div 
+      <button 
         className={`w-64 h-64 rounded-xl ${getColorForCount(currentValue)} flex flex-col items-center justify-center`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onClick={e => e.stopPropagation()}
+        onClick={handleTap}
       >
         <div className="text-6xl font-bold text-white">{currentValue}</div>
-        <div className="text-white mt-4 opacity-50">Swipe up/down to adjust</div>
+        <div className="text-white mt-4 opacity-50">Tap to increment</div>
+        <div className="text-white mt-2 opacity-50">Swipe up/down to adjust</div>
         <div className="text-white mt-2 opacity-50">Tap outside to close</div>
-      </div>
+      </button>
     </div>
   );
 };
