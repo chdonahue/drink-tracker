@@ -8,6 +8,8 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [startValue, setStartValue] = useState(initialValue);
 
+  const MAX_VALUE = 99;
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -18,7 +20,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const handleTouchStart = (e) => {
     e.preventDefault();
     setTouchStart(e.touches[0].clientY);
-    setStartValue(currentValue);
+    setStartValue(currentValue ?? 0);
   };
 
   const handleTouchMove = (e) => {
@@ -29,10 +31,19 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const diff = touchStart - currentTouch;
     const sensitivity = 10;
     const valueChange = Math.floor(diff / sensitivity);
-    const newValue = Math.max(0, startValue + valueChange);
-    
-    setCurrentValue(newValue);
-    onValueChange(newValue);
+    const newValue = startValue + valueChange;
+
+    // Special handling for values <= 0
+    if (newValue <= 0) {
+      setCurrentValue(undefined);
+      onValueChange(undefined);
+      return;
+    }
+
+    // Cap the maximum value at 99
+    const cappedValue = Math.min(newValue, MAX_VALUE);
+    setCurrentValue(cappedValue);
+    onValueChange(cappedValue);
   };
 
   const handleTouchEnd = () => {
@@ -40,10 +51,12 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   };
 
   const handleTap = (e) => {
-    e.stopPropagation(); // Prevent closing the adjuster
-    const newValue = currentValue + 1;
-    setCurrentValue(newValue);
-    onValueChange(newValue);
+    e.stopPropagation();
+    if (currentValue === undefined || currentValue < MAX_VALUE) {
+      const newValue = (currentValue ?? 0) + 1;
+      setCurrentValue(newValue);
+      onValueChange(newValue);
+    }
   };
 
   return (
@@ -58,9 +71,12 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
         onTouchEnd={handleTouchEnd}
         onClick={handleTap}
       >
-        <div className="text-6xl font-bold text-white">{currentValue}</div>
+        <div className="text-6xl font-bold text-white">
+          {currentValue === undefined ? '-' : currentValue}
+        </div>
         <div className="text-white mt-4 opacity-50">Tap to increment</div>
         <div className="text-white mt-2 opacity-50">Swipe up/down to adjust</div>
+        <div className="text-white mt-2 opacity-50">Swipe down to clear</div>
         <div className="text-white mt-2 opacity-50">Tap outside to close</div>
       </button>
     </div>

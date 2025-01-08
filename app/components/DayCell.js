@@ -1,4 +1,3 @@
-
 // import { useState, useEffect } from 'react';
 // import getColorForCount from '../utils/colorMapping';
 // import ValueAdjuster from './ValueAdjuster';
@@ -6,19 +5,16 @@
 // const DayCell = ({ date, count, onValueChange }) => {
 //   const [isMobile, setIsMobile] = useState(false);
 //   const [isAdjusting, setIsAdjusting] = useState(false);
+//   const MAX_VALUE = 99;
 
 //   useEffect(() => {
 //     const checkMobile = () => {
-//       // Check if device has touch capability
 //       const hasTouchScreen = (
 //         ('ontouchstart' in window) ||
 //         (navigator.maxTouchPoints > 0) ||
 //         (navigator.msMaxTouchPoints > 0)
 //       );
-      
-//       // Consider mobile only if touch is available AND viewport is narrow
 //       const isMobileDevice = hasTouchScreen && window.innerWidth <= 768;
-//       console.log('Is mobile device?', isMobileDevice);
 //       setIsMobile(isMobileDevice);
 //     };
     
@@ -29,16 +25,37 @@
 
 //   const handleClick = (e) => {
 //     if (!isMobile) {
-//       const input = prompt('Enter number of drinks:', count ?? '');
+//       const input = prompt('Enter number of drinks (0-99, or clear to reset):', count ?? '');
+      
+//       // Handle cancel
 //       if (input === null) return;
       
-//       const numCount = parseInt(input);
-//       if (isNaN(numCount) || numCount < 0) {
-//         alert('Please enter a valid positive number');
+//       // Handle clearing/resetting
+//       if (input.trim().toLowerCase() === 'clear' || input.trim() === '') {
+//         onValueChange(undefined);
 //         return;
 //       }
       
-//       onValueChange(date, numCount);
+//       // Handle numeric input
+//       const numCount = parseInt(input);
+//       // Check if it's a valid number
+//       if (isNaN(numCount)) {
+//         alert('Please enter a number, "clear", or leave empty to reset');
+//         return;
+//       }
+
+//       // Check range
+//       if (numCount > MAX_VALUE) {
+//         alert(`Maximum value is ${MAX_VALUE}`);
+//         return;
+//       }
+
+//       if (numCount < 0) {
+//         alert('Please enter a positive number');
+//         return;
+//       }
+      
+//       onValueChange(numCount);
 //     } else {
 //       setIsAdjusting(true);
 //     }
@@ -62,8 +79,7 @@
 //         <ValueAdjuster
 //           initialValue={count ?? 0}
 //           onValueChange={(value) => {
-//             onValueChange(date, value);
-//             setIsAdjusting(false);
+//             onValueChange(value);
 //           }}
 //           onClose={() => setIsAdjusting(false)}
 //         />
@@ -73,7 +89,6 @@
 // };
 
 // export default DayCell;
-
 
 
 import { useState, useEffect } from 'react';
