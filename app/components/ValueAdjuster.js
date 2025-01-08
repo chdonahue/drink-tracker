@@ -8,7 +8,6 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [startValue, setStartValue] = useState(initialValue);
 
-  // Prevent scrolling when component mounts
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -25,19 +24,20 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const handleTouchMove = (e) => {
     if (!touchStart) return;
     
-    e.preventDefault(); // Prevent scrolling during touch move
+    e.preventDefault();
     const currentTouch = e.touches[0].clientY;
     const diff = touchStart - currentTouch;
-    const sensitivity = 10; // Pixels per value change
+    const sensitivity = 10;
     const valueChange = Math.floor(diff / sensitivity);
     const newValue = Math.max(0, startValue + valueChange);
     
     setCurrentValue(newValue);
+    // Update the parent's value in real-time
+    onValueChange(newValue);
   };
 
   const handleTouchEnd = () => {
     setTouchStart(null);
-    onValueChange(currentValue);
   };
 
   return (
@@ -54,6 +54,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
       >
         <div className="text-6xl font-bold text-white">{currentValue}</div>
         <div className="text-white mt-4 opacity-50">Swipe up/down to adjust</div>
+        <div className="text-white mt-2 opacity-50">Tap outside to close</div>
       </div>
     </div>
   );
