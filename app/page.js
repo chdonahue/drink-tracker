@@ -41,62 +41,47 @@ export default function Home() {
   const handleDayClick = async (date, value) => {
     let numCount = value;
     
-    if (typeof value === 'undefined') {
-      const count = prompt('Enter number of drinks:');
-      if (count === null) return;
-      
-      numCount = parseInt(count);
-      if (isNaN(numCount) || numCount < 0) {
-        alert('Please enter a valid positive number');
-        return;
-      }
-    }
-
-    // If value is null, delete the record
+    // Optimistically update local state first
     if (value === null) {
-      try {
-        const { error } = await supabase
-          .from('drinks')
-          .delete()
-          .match({ user_id: user.id, date: date });
-
-        if (error) throw error;
-
-        // Remove the date from local state
-        setDrinkData(prev => {
-          const newData = { ...prev };
-          delete newData[date];
-          return newData;
-        });
-        return;
-      } catch (error) {
-        console.error('Error clearing drink count:', error);
-        alert('Failed to clear drink count. Please try again.');
-      }
-      return;
-    }
-  
-    // Handle normal case (setting a value)
-    try {
-      const { error } = await supabase
-        .from('drinks')
-        .upsert({ 
-          user_id: user.id,
-          date: date,
-          count: numCount
-        }, {
-          onConflict: 'user_id,date'
-        });
-  
-      if (error) throw error;
-  
+      setDrinkData(prev => {
+        const newData = { ...prev };
+        delete newData[date];
+        return newData;
+      });
+    } else {
       setDrinkData(prev => ({
         ...prev,
         [date]: numCount
       }));
+    }
+  
+    // Then update the database
+    try {
+      if (value === null) {
+        const { error } = await supabase
+          .from('drinks')
+          .delete()
+          .match({ user_id: user.id, date: date });
+  
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('drinks')
+          .upsert({ 
+            user_id: user.id,
+            date: date,
+            count: numCount
+          }, {
+            onConflict: 'user_id,date'
+          });
+  
+        if (error) throw error;
+      }
     } catch (error) {
+      // If database update fails, revert the optimistic update
       console.error('Error saving drink count:', error);
       alert('Failed to save drink count. Please try again.');
+      fetchDrinkData();  // Refresh from database
     }
   };
 
