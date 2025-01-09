@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import getColorForCount from '../utils/colorMapping';
 
-const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
-  const [currentValue, setCurrentValue] = useState(initialValue);
+const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
+  const [currentValue, setCurrentValue] = useState(null);  // Start with null
   const [touchStart, setTouchStart] = useState(null);
-  const [startValue, setStartValue] = useState(initialValue);
-  const [isClearing, setIsClearing] = useState(false);
+  const [startValue, setStartValue] = useState(null);  // Start with null
+  const [isClearing, setIsClearing] = useState(initialValue === null);  // Start in clearing state if initialValue is null
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -15,6 +15,15 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
       document.body.style.overflow = 'auto';
     };
   }, []);
+
+  useEffect(() => {
+    // Only set non-null values
+    if (initialValue !== null) {
+      setCurrentValue(initialValue);
+      setStartValue(initialValue);
+      setIsClearing(false);
+    }
+  }, [initialValue]);
 
   const triggerHaptic = (duration = 10) => {
     if ('vibrate' in navigator) {
@@ -25,8 +34,10 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
   const handleTouchStart = (e) => {
     e.preventDefault();
     setTouchStart(e.touches[0].clientY);
-    setStartValue(currentValue);
-    setIsClearing(false);
+    // Don't update startValue if we're in clearing state
+    if (!isClearing) {
+      setStartValue(currentValue ?? 0);
+    }
   };
 
   const handleTouchMove = (e) => {
@@ -36,20 +47,27 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
     const currentTouch = e.touches[0].clientY;
     const diff = touchStart - currentTouch;
     const sensitivity = 5; 
+    
+    if (isClearing) {
+      // If we're in clearing state and user swipes up significantly, exit clearing state
+      if (diff > 50) {
+        triggerHaptic(20);
+        setIsClearing(false);
+        setCurrentValue(0);
+      }
+      return;
+    }
+    
     const valueChange = Math.floor(diff / sensitivity);
-    const computedValue = startValue + valueChange;
+    const computedValue = (startValue ?? 0) + valueChange;
     
     if (computedValue < 0) {
       if (!isClearing) {
         triggerHaptic(20);
         setIsClearing(true);
-        setCurrentValue(0);
+        setCurrentValue(null);
       }
     } else {
-      if (isClearing) {
-        triggerHaptic(20);
-        setIsClearing(false);
-      }
       if (computedValue !== currentValue) {
         triggerHaptic(50);
       }
@@ -59,24 +77,19 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
 
   const handleTouchEnd = () => {
     setTouchStart(null);
-    // Only send the final value when touch ends
-    if (isClearing) {
-      onValueChange(null);
-    } else {
-      onValueChange(currentValue);
-    }
+    onValueChange(isClearing ? null : currentValue);
   };
 
   const handleTap = (e) => {
-    e.stopPropagation(); // Prevent closing the adjuster
+    e.stopPropagation();
     if (isClearing) {
       triggerHaptic(20);
       setIsClearing(false);
-      setCurrentValue(1);
-      onValueChange(1);
+      setCurrentValue(0);
+      onValueChange(0);
     } else {
       triggerHaptic(8);
-      const newValue = currentValue + 1;
+      const newValue = (currentValue ?? 0) + 1;
       setCurrentValue(newValue);
       onValueChange(newValue);
     }
@@ -96,7 +109,7 @@ const ValueAdjuster = ({ initialValue = 0, onValueChange, onClose }) => {
         onClick={handleTap}
       >
         <div className="text-6xl font-bold text-white">
-          {isClearing ? '—' : currentValue}
+          {isClearing ? '—' : currentValue ?? 0}
         </div>
         <div className="text-white mt-4 opacity-50">
           {isClearing ? 'Release to clear' : 'Tap to increment'}
