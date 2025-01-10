@@ -31,6 +31,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
 
   return (
     <div className="flex flex-col gap-8">
+      {/* Main Calendar */}
       <div className="bg-white rounded-lg shadow p-4 w-full">
         <div className="flex justify-between items-center mb-4">
           <button 
@@ -40,7 +41,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
             <ChevronLeft className="w-6 h-6 stroke-2" />
           </button>
           
-          <h2 className="text-[5vw] font-semibold text-black">{monthYear}</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-black">{monthYear}</h2>
           
           <button 
             onClick={() => navigateMonth(1)}
@@ -52,7 +53,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
 
         <div className="grid grid-cols-7 gap-1">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center font-semibold p-2 text-[3vw] text-black">
+            <div key={day} className="text-center font-semibold p-2 text-sm md:text-base text-black">
               {day}
             </div>
           ))}
@@ -67,24 +68,54 @@ const Calendar = ({ drinkData, onDayClick }) => {
             const drinkCount = drinkData[dateStr];
             
             return (
-                <div key={day} className="relative">
-                  <span className="absolute top-1 left-1 text-[2vw] text-black z-10">
-                    {day}
-                  </span>
-                  <DayCell 
-                    date={dateStr}
-                    count={drinkCount}
-                    onValueChange={(date, value) => onDayClick(date, value)}
-                  />
-                </div>
-              );
-            })}
+              <div key={day} className="relative">
+                <span className="absolute top-1 left-1 text-xs md:text-sm text-black z-10">
+                  {day}
+                </span>
+                <DayCell 
+                  date={dateStr}
+                  count={drinkCount}
+                  onValueChange={(date, value) => onDayClick(date, value)}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
+      {/* Legend */}
+      <div className="w-full bg-white rounded-lg shadow-lg py-3 px-4">
+        <h3 className="text-sm font-semibold mb-2 text-black">Legend</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 bg-green-300 rounded"></div>
+            <span className="text-black text-xs">0 drinks</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 bg-yellow-400 rounded"></div>
+            <span className="text-black text-xs">1-2 drinks</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 bg-orange-400 rounded"></div>
+            <span className="text-black text-xs">3-5 drinks</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            <span className="text-black text-xs">6-9 drinks</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 bg-neutral-700 rounded"></div>
+            <span className="text-black text-xs">10+ drinks</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mini Calendar */}
       <div className="bg-white rounded-lg shadow p-4 w-full">
-        <h2 className="text-lg font-semibold mb-4 text-black text-center text-[5vw]">{currentYear} Overview</h2>
-        <div className="grid grid-cols-4 gap-4 w-full min-h-[30vh]">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4 text-black text-center">
+          {currentYear} Overview
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {months.map((month, index) => (
             <MiniMonth
               key={month}

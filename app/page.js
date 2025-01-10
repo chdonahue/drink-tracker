@@ -121,40 +121,11 @@ export default function Home() {
         </div>
   
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-grow">
-            <Calendar 
-              drinkData={drinkData} 
-              onDayClick={handleDayClick}
-            />
-          </div>
-  
-          {/* Legend */}
-          <div className="w-full lg:w-64 bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-black">Legend</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-green-300 rounded"></div>
-                <span className="text-black">0 drinks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-yellow-400 rounded"></div>
-                <span className="text-black">1-2 drinks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-orange-400 rounded"></div>
-                <span className="text-black">3-5 drinks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-red-500 rounded"></div>
-                <span className="text-black">6-9 drinks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-neutral-700 rounded"></div>
-                <span className="text-black">10+ drinks</span>
-              </div>
-            </div>
-          </div>
+        <div className="w-full">
+          <Calendar 
+            drinkData={drinkData} 
+            onDayClick={handleDayClick}
+          />
         </div>
       </div>
     </div>
