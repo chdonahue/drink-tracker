@@ -51,7 +51,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-x-1.5">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
             <div key={day} className="text-center font-semibold p-2 text-sm md:text-base text-black">
               {day}
