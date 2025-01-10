@@ -115,7 +115,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
         <h2 className="text-xl md:text-2xl font-semibold mb-4 text-black text-center">
           {currentYear} Overview
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-4 w-full">
           {months.map((month, index) => (
             <MiniMonth
               key={month}

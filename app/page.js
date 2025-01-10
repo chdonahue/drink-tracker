@@ -98,17 +98,8 @@ export default function Home() {
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold">Drink Tracker</h1>
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            <a 
-              href="https://www.buymeacoffee.com/donahuechrw" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="px-4 py-2 bg-yellow-500 text-black font-medium rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="text-xl">☕</span>
-              <span>Buy me a coffee</span>
-            </a>
+          <div className="flex justify-between w-full items-center">
+            <h1 className="text-2xl font-bold">Drink Tracker</h1>
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
@@ -118,6 +109,15 @@ export default function Home() {
               Sign Out
             </button>
           </div>
+          <a 
+            href="https://www.buymeacoffee.com/donahuechrw" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-full px-4 py-2 bg-yellow-500 text-black font-medium rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2"
+          >
+            <span className="text-xl">☕</span>
+            <span>Buy me a coffee</span>
+          </a>
         </div>
   
         {/* Main Content */}
