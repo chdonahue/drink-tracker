@@ -86,9 +86,9 @@ export default function Home() {
     }
   };
 
-  if (!user) {
-    return <AuthComponent />;
-  }
+  // if (!user) {  // DO THIS FOR FEATURE TESTING
+  //   return <AuthComponent />;
+  // }
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
