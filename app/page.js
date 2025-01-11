@@ -100,7 +100,7 @@ export default function Home() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="flex justify-between w-full items-center">
-            <h1 className="text-2xl font-bold">Drink Tracker</h1>
+            <h1 className="text-2xl font-bold">Drink Tracker Test</h1>
             <div className="flex gap-2">
               <ShareButton />
               <button
