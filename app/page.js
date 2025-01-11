@@ -2,6 +2,7 @@
 import { useAuth } from './contexts/AuthContext';
 import AuthComponent from './components/Auth';
 import Calendar, {getColorForCount} from './components/Calendar';
+import ShareButton from './components/ShareButton';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 
@@ -100,14 +101,17 @@ export default function Home() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="flex justify-between w-full items-center">
             <h1 className="text-2xl font-bold">Drink Tracker</h1>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-              }}
-              className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-            >
-              Sign Out
-            </button>
+            <div className="flex gap-2">
+              <ShareButton />
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                }}
+                className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
           <a 
             href="https://www.buymeacoffee.com/donahuechrw" 
