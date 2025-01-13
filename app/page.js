@@ -4,7 +4,7 @@ import AuthComponent from './components/Auth';
 import Calendar, {getColorForCount} from './components/Calendar';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
-import ShareButton from './components/ShareButton';
+import ShareButtons from './components/ShareButtons';
 
 export default function Home() {
   const { user } = useAuth();
@@ -102,7 +102,7 @@ export default function Home() {
           <div className="flex justify-between w-full items-center">
             <h1 className="text-2xl font-bold">Drink Tracker</h1>
             <div className="flex gap-2">
-              <ShareButton />
+              <ShareButtons />
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();
