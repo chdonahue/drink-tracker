@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MiniMonth from './MiniMonth';
 import DayCell from './DayCell';
 import getColorForCount from '../utils/colorMapping';
+import YearlyCalendarExport from './YearlyCalendarExport';
 
 const Calendar = ({ drinkData, onDayClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -31,7 +32,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Exportable content wrapper */}
+      {/* Monthly view export container */}
       <div className="calendar-export-container space-y-8">
         {/* Main Calendar */}
         <div className="bg-white rounded-lg shadow p-4 w-full">
@@ -113,7 +114,14 @@ const Calendar = ({ drinkData, onDayClick }) => {
         </div>
       </div>
   
-      {/* Mini Calendar (outside export container) */}
+      {/* Yearly view export container (hidden by default) */}
+      <YearlyCalendarExport
+        year={currentYear}
+        drinkData={drinkData}
+        getColorForCount={getColorForCount}
+      />
+  
+      {/* Mini Calendar (not part of export) */}
       <div className="bg-white rounded-lg shadow p-4 w-full">
         <h2 className="text-xl md:text-2xl font-semibold mb-4 text-black text-center">
           {currentYear} Overview
