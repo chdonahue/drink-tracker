@@ -1,4 +1,3 @@
-// BELOW IS THE NEW VERSION
 import { useState, useEffect } from 'react';
 import getColorForCount from '../utils/colorMapping';
 import ValueAdjuster from './ValueAdjuster';
@@ -53,9 +52,12 @@ const DayCell = ({ date, count, onValueChange }) => {
         className="w-full aspect-square relative group hover:bg-gray-50 cursor-pointer border-none"
       >
         <div className={`w-full h-full ${getColorForCount(count)}`} />
-        {count !== undefined && (
-          <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white transition-opacity">
-            <span className="text-[4vw] font-bold">{count}</span>
+        <span className="absolute top-1 left-1 text-xs md:text-sm text-black z-10">
+          {date.split('-')[2].replace(/^0/, '')}
+        </span>
+        {count !== undefined && count !== null && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xl font-bold text-white text-opacity-50 translate-y-1">{count}</span>
           </div>
         )}
       </button>
