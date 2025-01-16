@@ -85,20 +85,20 @@ const ShareButtons = () => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="grid grid-cols-2 gap-4 w-full">
       <button
         onClick={() => handleShare('month')}
         disabled={isGenerating}
-        className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center gap-2"
+        className="w-full px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
       >
         <Share2 className="w-4 h-4" />
         <span>{isGenerating ? 'Generating...' : 'Share Month'}</span>
       </button>
-
+  
       <button
         onClick={() => handleShare('year')}
         disabled={isGenerating}
-        className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center gap-2"
+        className="w-full px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
       >
         <Share2 className="w-4 h-4" />
         <span>{isGenerating ? 'Generating...' : 'Share Year'}</span>
