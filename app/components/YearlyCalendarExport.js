@@ -50,23 +50,23 @@ const YearlyCalendarExport = ({ year, drinkData, getColorForCount }) => {
                 <h3 className="text-sm font-semibold mb-2 text-black">Legend</h3>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-green-300 rounded translate-y-2"></div>
+                    <div className="w-4 h-4 bg-green-300 rounded"></div>
                     <span className="text-black text-xs">0 drinks</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-yellow-400 rounded translate-y-2"></div>
+                    <div className="w-4 h-4 bg-yellow-400 rounded"></div>
                     <span className="text-black text-xs">1-2 drinks</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-orange-400 rounded translate-y-2"></div>
+                    <div className="w-4 h-4 bg-orange-400 rounded"></div>
                     <span className="text-black text-xs">3-5 drinks</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-red-500 rounded translate-y-2"></div>
+                    <div className="w-4 h-4 bg-red-500 rounded"></div>
                     <span className="text-black text-xs">6-9 drinks</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 bg-neutral-700 rounded translate-y-2"></div>
+                    <div className="w-4 h-4 bg-neutral-700 rounded"></div>
                     <span className="text-black text-xs">10+ drinks</span>
                     </div>
                 </div>
