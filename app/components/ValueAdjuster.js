@@ -1,6 +1,5 @@
 'use client';
 
-// This is the current version which fixed a bug in moving from the null state:
 import React, { useState, useEffect } from 'react';
 import getColorForCount from '../utils/colorMapping';
 
@@ -10,7 +9,6 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
     const [startValue, setStartValue] = useState(0);
     const [isClearing, setIsClearing] = useState(initialValue === null);
   
-  // Add debug logs for state changes
   useEffect(() => {
     console.log('State changed:', {
       currentValue,
@@ -30,8 +28,8 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
   useEffect(() => {
     // Only set non-null values
     if (initialValue !== null) {
-      setCurrentValue(initialValue);
-      setStartValue(initialValue);
+      setCurrentValue(Math.min(initialValue, 99)); // Ensure initial value doesn't exceed 99
+      setStartValue(Math.min(initialValue, 99));
       setIsClearing(false);
     }
   }, [initialValue]);
@@ -68,7 +66,7 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
     
     // Normal value adjustment when not clearing
     const valueChange = Math.floor(diff / sensitivity);
-    const computedValue = Math.max(0, startValue + valueChange);
+    const computedValue = Math.min(99, Math.max(0, startValue + valueChange)); // Limit between 0 and 99
     
     if (computedValue === 0 && valueChange < 0) {
       triggerHaptic(20);
@@ -81,8 +79,6 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
       setCurrentValue(computedValue);
     }
   };
-
-
 
   const handleTouchEnd = () => {
     setTouchStart(null);
@@ -98,7 +94,10 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
       onValueChange(0);
     } else {
       triggerHaptic(8);
-      const newValue = (currentValue ?? 0) + 1;
+      const newValue = Math.min(99, (currentValue ?? 0) + 1); // Limit increment to 99
+      if (newValue === 99) {
+        triggerHaptic(100); // Longer vibration to indicate max value
+      }
       setCurrentValue(newValue);
       onValueChange(newValue);
     }
@@ -123,9 +122,9 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
         <div className="text-white mt-4 opacity-50">
           {isClearing ? 'Tap or swipe up to adjust' : 'Tap or swipe up/down to adjust'}
         </div>
-        {/* <div className="text-white mt-2 opacity-50">
-          {isClearing ? 'Tap to increment' : 'Swipe up/down to adjust'}
-        </div> */}
+        {currentValue === 99 && !isClearing && (
+          <div className="text-white mt-2 opacity-75">Maximum value reached</div>
+        )}
         <div className="text-white mt-2 opacity-50">Tap outside to close</div>
       </button>
     </div>

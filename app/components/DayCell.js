@@ -34,8 +34,8 @@ const DayCell = ({ date, count, onValueChange }) => {
         }
         
         const numCount = parseInt(input);
-        if (isNaN(numCount) || numCount < 0) {
-          alert('Please enter a valid positive number or leave blank to clear');
+        if (isNaN(numCount) || numCount < 0 || numCount > 99) {
+          alert('Please enter a number between 0 and 99, or leave blank to clear');
           return;
         }
         
