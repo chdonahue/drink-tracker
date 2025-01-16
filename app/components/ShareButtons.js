@@ -23,6 +23,22 @@ const ShareButtons = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  const getFileName = (mode) => {
+    const date = new Date();
+    const year = date.getFullYear();
+    
+    if (mode === 'month') {
+      const monthNames = [
+        'january', 'february', 'march', 'april', 'may', 'june',
+        'july', 'august', 'september', 'october', 'november', 'december'
+      ];
+      const month = monthNames[date.getMonth()];
+      return `${month}_${year}.png`;
+    } else {
+      return `${year}.png`;
+    }
+  };
+
   const generateImage = async (mode) => {
     setIsGenerating(true);
     try {
@@ -66,7 +82,7 @@ const ShareButtons = () => {
   const handleShare = async (mode) => {
     try {
       const imageBlob = await generateImage(mode);
-      const fileName = `drink-calendar-${mode}.png`;
+      const fileName = getFileName(mode);
       
       if (isMobile && navigator.share) {
         const file = new File([imageBlob], fileName, { type: 'image/png' });
