@@ -4,21 +4,23 @@ import MiniMonth from './MiniMonth';
 import DayCell from './DayCell';
 import getColorForCount from '../utils/colorMapping';
 import YearlyCalendarExport from './YearlyCalendarExport';
-import WeeklyStats from './WeeklyStats';
 
 
-const Calendar = ({ drinkData, onDayClick }) => {
+const Calendar = ({ drinkData, onDayClick, onMonthChange }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   
   const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
   
   const navigateMonth = (direction) => {
-    setCurrentDate(prevDate => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(prevDate.getMonth() + direction);
-      return newDate;
-    });
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() + direction);
+    setCurrentDate(newDate);
+    
+    // Call onMonthChange after state update
+    if (onMonthChange) {
+      onMonthChange(newDate.toISOString().split('T')[0]);
+    }
   };
 
   const monthYear = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -31,6 +33,11 @@ const Calendar = ({ drinkData, onDayClick }) => {
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+
+  const handleMonthChange = ({ activeStartDate }) => {
+    // activeStartDate will be the first date visible in the new month view
+    onMonthChange(activeStartDate.toISOString().split('T')[0]);
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -142,7 +149,7 @@ const Calendar = ({ drinkData, onDayClick }) => {
         </div>
       </div>
      {/* Weekly Stats */}
-      <WeeklyStats drinkData={drinkData} />
+      {/* <WeeklyStats drinkData={drinkData} /> */}
     </div>
   );
 };

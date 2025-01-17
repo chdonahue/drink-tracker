@@ -5,11 +5,17 @@ import Calendar, {getColorForCount} from './components/Calendar';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import ShareButtons from './components/ShareButtons';
+import WeeklyStats from './components/WeeklyStats';
+
+// import DebugStats from './components/DebugStats';
+
 
 export default function Home() {
   const { user } = useAuth();
   const [drinkData, setDrinkData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
 
   useEffect(() => {
     if (user) {
@@ -94,6 +100,7 @@ export default function Home() {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
   return (
+    
     <div className="min-h-screen">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
@@ -124,12 +131,18 @@ export default function Home() {
             <span>Buy me a coffee</span>
           </a>
         </div>
-  
+        {/* <DebugStats drinkData={drinkData} /> */}
+
         {/* Main Content */}
-        <div className="w-full">
+        <div className="w-full space-y-8">
           <Calendar 
             drinkData={drinkData} 
             onDayClick={handleDayClick}
+            onMonthChange={(date) => setSelectedDate(date)}
+          />
+          <WeeklyStats 
+            drinkData={drinkData} 
+            selectedDate={selectedDate}
           />
         </div>
       </div>
