@@ -4,6 +4,8 @@ import MiniMonth from './MiniMonth';
 import DayCell from './DayCell';
 import getColorForCount from '../utils/colorMapping';
 import YearlyCalendarExport from './YearlyCalendarExport';
+import WeeklyStats from './WeeklyStats';
+
 
 const Calendar = ({ drinkData, onDayClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -139,6 +141,8 @@ const Calendar = ({ drinkData, onDayClick }) => {
           ))}
         </div>
       </div>
+     {/* Weekly Stats */}
+      <WeeklyStats drinkData={drinkData} />
     </div>
   );
 };
