@@ -200,14 +200,12 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
             
             {/* Legend */}
             <g transform={`translate(${chartWidth - 100}, -5)`}>
-              <circle
-                cx={5}
-                cy={0}
-                r={5}
-                fill="#ef4444"
-                stroke="white"
-                strokeWidth={2}
-              />
+              <path
+                  d="M 5 -8 L 13 0 L 5 8 L -3 0 Z"
+                  fill="#ef4444"
+                  stroke="white"
+                  strokeWidth={2}
+                />
               <text
                 x={15}
                 y={0}
@@ -300,12 +298,13 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
                   
                   {/* Current week dot */}
                   {d.current !== null && (
-                    <circle
-                      cx={0}
-                      cy={yScale(d.current)}
-                      r={5}
+                    <path
+                      d={`M ${0} ${yScale(d.current) - 10} 
+                          L ${8} ${yScale(d.current)} 
+                          L ${0} ${yScale(d.current) + 10} 
+                          L ${-8} ${yScale(d.current)} Z`}
                       fill="#ef4444"
-                      stroke="white"
+                      stroke="black"
                       strokeWidth={2}
                     />
                   )}
@@ -313,7 +312,7 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
                   {/* X-axis label */}
                   <text
                     x={0}
-                    y={chartHeight + 35}
+                    y={chartHeight + 45}
                     textAnchor="middle"
                     className="text-3xl font-medium fill-gray-600"
                   >
