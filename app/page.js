@@ -6,16 +6,15 @@ import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import ShareButtons from './components/ShareButtons';
 import WeeklyStats from './components/WeeklyStats';
-
-// import DebugStats from './components/DebugStats';
-
+import MonthlyStats from './components/MonthlyStats';
+import TabGroup from './components/TabGroup';
 
 export default function Home() {
   const { user } = useAuth();
   const [drinkData, setDrinkData] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-
+  const [activeTab, setActiveTab] = useState('weekly');
 
   useEffect(() => {
     if (user) {
@@ -99,8 +98,8 @@ export default function Home() {
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
+
   return (
-    
     <div className="min-h-screen">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
@@ -108,7 +107,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-center">Drink Tracker</h1>
           
           <div className="grid grid-cols-3 w-full gap-4">
-            <div className="col-span-2"> {/* This will take up 2 columns */}
+            <div className="col-span-2">
               <ShareButtons />
             </div>
             <button
@@ -131,7 +130,6 @@ export default function Home() {
             <span>Buy me a coffee</span>
           </a>
         </div>
-        {/* <DebugStats drinkData={drinkData} /> */}
 
         {/* Main Content */}
         <div className="w-full space-y-8">
@@ -140,10 +138,21 @@ export default function Home() {
             onDayClick={handleDayClick}
             onMonthChange={(date) => setSelectedDate(date)}
           />
-          <WeeklyStats 
-            drinkData={drinkData} 
-            selectedDate={selectedDate}
+          <TabGroup 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
           />
+          {activeTab === 'weekly' ? (
+            <WeeklyStats 
+              drinkData={drinkData} 
+              selectedDate={selectedDate}
+            />
+          ) : (
+            <MonthlyStats 
+              drinkData={drinkData}
+              selectedDate={selectedDate}
+            />
+          )}
         </div>
       </div>
     </div>
