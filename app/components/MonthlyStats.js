@@ -71,18 +71,18 @@ const MonthlyStats = ({ drinkData, selectedDate }) => {
   return (
     <div className="bg-white p-4 w-full">
       <h2 className="text-xl md:text-2xl font-bold mb-4 text-center text-gray-900">
-        Monthly ({selectedYear})
+        {selectedYear}: Average Drinks per Week by Month
       </h2>
-      <div className="w-full" style={{ height: "400px" }}>
-        <ResponsiveContainer width="100%" height={400}>
+      <div className="w-full" style={{ height: "300px" }}>
+        <ResponsiveContainer width="100%" height={300}>
           <ComposedChart
             data={data}
             margin={{ top: 20, right: 30, left: 50, bottom: 70 }}
-            height={400}
+            height={300}
           >
             <XAxis 
               dataKey="month" 
-              tick={{ fontSize: 16 }}
+              tick={{ fontSize: 14 }}
               padding={{ left: 30, right: 30 }}
               interval={0}
               angle={-90}
@@ -91,12 +91,12 @@ const MonthlyStats = ({ drinkData, selectedDate }) => {
               textAnchor="end"
             />
             <YAxis
-              tick={{ fontSize: 16 }}
+              tick={{ fontSize: 14 }}
               label={{ 
                 value: 'Drinks per Week', 
                 angle: -90, 
                 position: 'insideLeft',
-                style: { fontSize: 18 },
+                style: { fontSize: 14 },
                 dy: 40  // Add dy to center the label
               }}
               domain={[0, yAxisMax]}
