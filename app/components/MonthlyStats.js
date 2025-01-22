@@ -71,13 +71,13 @@ const MonthlyStats = ({ drinkData, selectedDate }) => {
   return (
     <div className="bg-white p-4 w-full">
       <h2 className="text-xl md:text-2xl font-bold mb-4 text-center text-gray-900">
-        {selectedYear}: Average Drinks per Week by Month
+        Monthly ({selectedYear})
       </h2>
       <div className="w-full" style={{ height: "300px" }}>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart
             data={data}
-            margin={{ top: 20, right: 30, left: 50, bottom: 70 }}
+            margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
             height={300}
           >
             <XAxis 
