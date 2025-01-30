@@ -14,10 +14,11 @@ const Calendar = ({ drinkData, onDayClick, onMonthChange }) => {
   
   const navigateMonth = (direction) => {
     const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() + direction);
-    setCurrentDate(newDate);
+    newDate.setDate(1);  // Ensure the first day of the month
+    newDate.setMonth(newDate.getMonth() + direction);
     
-    // Call onMonthChange after state update
+    setCurrentDate(newDate);
+  
     if (onMonthChange) {
       onMonthChange(newDate.toISOString().split('T')[0]);
     }
