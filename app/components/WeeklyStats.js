@@ -1,9 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
+import { getUserTimeZone, getLocalDateString, getStartOfWeek } from '../utils/time';
+
 
 const WeeklyStats = ({ drinkData, selectedDate }) => {
-  const selectedYear = selectedDate ? new Date(selectedDate).getFullYear() : new Date().getFullYear();
-  
+  // Use local timezone when parsing the selected date
+  const selectedYear = selectedDate ? 
+    new Date(selectedDate + 'T00:00:00').getFullYear() : 
+    new Date().getFullYear();
   // Debug logs
   console.log('WeeklyStats render:');
   console.log('- selectedDate:', selectedDate);
@@ -13,20 +17,27 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
   console.log('Selected Year:', selectedYear);
   const getCurrentWeekDates = () => {
     const today = new Date();
-    // Ensure we're working with UTC dates
-    const utcToday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-    const currentDay = new Date(utcToday).getUTCDay();
-    const diff = new Date(utcToday).getUTCDate() - currentDay;
-    const weekStart = new Date(utcToday);
-    weekStart.setUTCDate(diff);
+    const currentDay = today.getDay();
+    const diff = today.getDate() - currentDay;
+    const weekStart = new Date(today);
+    weekStart.setDate(diff);
     
     const dates = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(weekStart);
-      date.setUTCDate(weekStart.getUTCDate() + i);
-      const dateStr = date.toISOString().split('T')[0];
+      date.setDate(weekStart.getDate() + i);
+      // Format the date string to match the format in drinkData
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
       dates.push(dateStr);
     }
+    
+    // Debug
+    console.log('Generated dates:', dates);
+    console.log('Sample from drinkData:', Object.keys(drinkData).slice(0, 3));
+    
     return dates;
   };
 
@@ -107,18 +118,21 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
 
     Object.entries(drinkData).forEach(([dateStr, count]) => {
       if (count !== null && count !== undefined) {
-        const date = new Date(dateStr + 'T00:00:00Z');
-        const dayOfWeek = date.getUTCDay();
+        // Add time to ensure consistent date parsing
+        const date = new Date(dateStr + 'T12:00:00');
+        const dayOfWeek = date.getDay();
         
         if (currentWeekDates.includes(dateStr)) {
-          // If it's current week data, only add to current week tracker
           currentWeekData[dayOfWeek] = count;
         } else if (date.getFullYear() === selectedYear) {
-          // Only add to historical data if it's from selected year AND not current week
           dayTotals[dayOfWeek].push(count);
         }
       }
     });
+    
+    // After processing, log the current week data
+    console.log('Current week data:', currentWeekData);
+    
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return dayNames.map((day, index) => {
@@ -340,7 +354,12 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
             <path
               d={data.reduce((path, d, i) => {
                 const x = (i * (chartWidth / 7)) + (chartWidth / 14);
-                if (d.current === null) return path;
+                const today = new Date();
+                const dayIndex = today.getDay();
+                
+                // Only include points up to current day of week
+                if (d.current === null || i > dayIndex) return path;
+                
                 return path + `${path ? 'L' : 'M'} ${x} ${yScale(d.current)}`;
               }, '')}
               stroke="#ef4444"
@@ -351,7 +370,11 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
             {/* Current week dots (rendered last to be on top) */}
             {data.map((d, i) => {
               const x = (i * (chartWidth / 7)) + (chartWidth / 14);
-              if (d.current === null) return null;
+              const today = new Date();
+              const dayIndex = today.getDay();
+              
+              // Only show dots up to current day of week
+              if (d.current === null || i > dayIndex) return null;
               
               return (
                 <path

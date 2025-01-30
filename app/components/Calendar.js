@@ -4,6 +4,9 @@ import MiniMonth from './MiniMonth';
 import DayCell from './DayCell';
 import getColorForCount from '../utils/colorMapping';
 import YearlyCalendarExport from './YearlyCalendarExport';
+import { getLocalDateString, getUserTimeZone } from '../utils/time';
+
+
 
 
 const Calendar = ({ drinkData, onDayClick, onMonthChange }) => {
@@ -14,13 +17,28 @@ const Calendar = ({ drinkData, onDayClick, onMonthChange }) => {
   
   const navigateMonth = (direction) => {
     const newDate = new Date(currentDate);
-    newDate.setDate(1);  // Ensure the first day of the month
-    newDate.setMonth(newDate.getMonth() + direction);
     
+    // Get current values
+    let targetMonth = newDate.getMonth() + direction;
+    let targetYear = newDate.getFullYear();
+    
+    // Handle year boundary
+    if (targetMonth < 0) {
+      targetMonth = 11;
+      targetYear--;
+    } else if (targetMonth > 11) {
+      targetMonth = 0;
+      targetYear++;
+    }
+    
+    // Set to first of the target month
+    newDate.setFullYear(targetYear, targetMonth, 1);
     setCurrentDate(newDate);
   
     if (onMonthChange) {
-      onMonthChange(newDate.toISOString().split('T')[0]);
+      // Use the utility function to ensure consistent timezone handling
+      const dateString = getLocalDateString(newDate);
+      onMonthChange(dateString);
     }
   };
 
