@@ -111,8 +111,10 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
                   value: `Goal: ${weeklyGoal}`,
                   position: 'right',
                   fill: '#4b5563'
+                
                 }}
               />
+              
             )}
             <Bar
               dataKey="average"

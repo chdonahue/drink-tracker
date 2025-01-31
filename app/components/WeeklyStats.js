@@ -2,19 +2,11 @@ import React from 'react';
 import _ from 'lodash';
 import { getUserTimeZone, getLocalDateString, getStartOfWeek } from '../utils/time';
 
-
 const WeeklyStats = ({ drinkData, selectedDate }) => {
-  // Use local timezone when parsing the selected date
   const selectedYear = selectedDate ? 
     new Date(selectedDate + 'T00:00:00').getFullYear() : 
     new Date().getFullYear();
-  // Debug logs
-  console.log('WeeklyStats render:');
-  console.log('- selectedDate:', selectedDate);
-  console.log('- selectedYear:', selectedYear);
-  
-  console.log('Selected Date:', selectedDate);
-  console.log('Selected Year:', selectedYear);
+
   const getCurrentWeekDates = () => {
     const today = new Date();
     const currentDay = today.getDay();
@@ -26,84 +18,52 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
     for (let i = 0; i < 7; i++) {
       const date = new Date(weekStart);
       date.setDate(weekStart.getDate() + i);
-      // Format the date string to match the format in drinkData
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const dateStr = `${year}-${month}-${day}`;
       dates.push(dateStr);
     }
-    
-    // Debug
-    console.log('Generated dates:', dates);
-    console.log('Sample from drinkData:', Object.keys(drinkData).slice(0, 3));
-    
     return dates;
   };
 
   const calculateStats = (values) => {
     if (values.length === 0) return { 
-      min: 0, 
       mean: 0, 
       std: 0,
       count: 0,
       boxMin: 0,
       boxMax: 0,
-      whiskerMin: 0,
-      whiskerMax: 0
+      maxValue: 0
     };
     
     const mean = _.sum(values) / values.length;
+    const maxValue = Math.max(...values);
     
-    // If all values are the same, std will be 0
+    // If all values are the same
     const allSame = values.every(v => v === values[0]);
     if (allSame) {
       return {
-        min: values[0],
         mean: values[0],
         std: 0,
         count: values.length,
         boxMin: values[0],
         boxMax: values[0],
-        whiskerMin: values[0],
-        whiskerMax: values[0]
+        maxValue: values[0]
       };
     }
     
-    // Calculate standard deviation
     const squareDiffs = values.map(value => Math.pow(value - mean, 2));
     const std = Math.sqrt(_.sum(squareDiffs) / values.length);
     
-    // Ensure we don't go below 0 for any values
     return {
-      min: Math.min(...values),
       mean: mean,
       std: std,
       count: values.length,
       boxMin: Math.max(0, mean - std),
       boxMax: mean + std,
-      whiskerMin: Math.max(0, mean - 2 * std),
-      whiskerMax: mean + 2 * std
+      maxValue: maxValue
     };    
-    // const getPercentile = (arr, p) => {
-    //   const pos = (arr.length - 1) * p;
-    //   const base = Math.floor(pos);
-    //   const rest = pos - base;
-    //   if (arr[base + 1] !== undefined) {
-    //     return arr[base] + rest * (arr[base + 1] - arr[base]);
-    //   } else {
-    //     return arr[base];
-    //   }
-    // };
-
-    // return {
-    //   min: sorted[0],
-    //   q1: getPercentile(sorted, 0.25),
-    //   median: getPercentile(sorted, 0.5),
-    //   q3: getPercentile(sorted, 0.75),
-    //   max: sorted[sorted.length - 1],
-    //   count: values.length
-    // };
   };
 
   const getStats = () => {
@@ -118,7 +78,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
 
     Object.entries(drinkData).forEach(([dateStr, count]) => {
       if (count !== null && count !== undefined) {
-        // Add time to ensure consistent date parsing
         const date = new Date(dateStr + 'T12:00:00');
         const dayOfWeek = date.getDay();
         
@@ -129,10 +88,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
         }
       }
     });
-    
-    // After processing, log the current week data
-    console.log('Current week data:', currentWeekData);
-    
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return dayNames.map((day, index) => {
@@ -149,20 +104,15 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
   };
 
   const generateYAxisTicks = (maxValue) => {
-    // If maxValue is less than 10, use unit increments
     if (maxValue <= 10) {
       return _.range(0, Math.ceil(maxValue) + 1);
     }
     
-    // For larger ranges, generate ~5-7 ticks
     const tickCount = 6;
     const roughStep = maxValue / (tickCount - 1);
-    
-    // Round step to a nice number
     const magnitudeOfStep = Math.pow(10, Math.floor(Math.log10(roughStep)));
     let step = Math.ceil(roughStep / magnitudeOfStep) * magnitudeOfStep;
     
-    // Ensure we don't generate too many ticks for nice numbers like 20
     if ((maxValue / step) > tickCount) {
       step = step * 2;
     }
@@ -172,7 +122,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
       ticks.push(i);
     }
     
-    // Add the maxValue if it's not already included
     if (ticks[ticks.length - 1] < maxValue) {
       ticks.push(Math.ceil(maxValue));
     }
@@ -183,20 +132,18 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
   const data = getStats();
   const maxValue = Math.max(
     ...data.map(d => Math.max(
-      d.whiskerMax || 0,  // Consider the whisker max (mean + 2*std)
-      d.current || 0      // Consider current week's value
+      d.maxValue || 0,
+      d.current || 0
     )),
-    1  // Ensure we always have a non-zero scale
+    1
   );
 
-  // SVG dimensions and scales
   const width = 800;
   const height = 500;
   const margin = { top: 50, right: 30, bottom: 50, left: 100 };
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
   
-  // Calculate scales with padding
   const yScale = (value) => chartHeight - (value / maxValue) * (chartHeight * 0.9);
   
   return (
@@ -213,8 +160,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
           preserveAspectRatio="xMidYMid meet"
         >
           <g transform={`translate(${margin.left}, ${margin.top})`}>
-            {/* All existing SVG elements remain exactly the same */}
-            {/* Y-axis label */}
             <text
               transform="rotate(-90)"
               x={-chartHeight / 2}
@@ -225,10 +170,9 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
               Number of Drinks
             </text>
             
-            {/* Legend */}
-            <g transform={`translate(${chartWidth - 100}, -5)`}>
+            <g transform={`translate(${chartWidth - 100}, -15)`}>
               <path
-                d="M 5 -8 L 13 0 L 5 8 L -3 0 Z"
+                d="M 0 -8 L 8 0 L 0 8 L -8 0 Z"
                 fill="#ef4444"
                 stroke="white"
                 strokeWidth={2}
@@ -241,19 +185,24 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
               >
                 Current Week
               </text>
+              
+              <path
+                d="M 0,20 L 2,26 8,26 4,30 6,36 0,32 -6,36 -4,30 -8,26 -2,26 Z"
+                fill="#374151"
+                stroke="none"
+              />
+              <text
+                x={15}
+                y={30}
+                dominantBaseline="middle"
+                className="text-base fill-gray-600"
+              >
+                Max
+              </text>
             </g>
 
-            {/* Y-axis */}
-            <line
-              x1={0}
-              y1={0}
-              x2={0}
-              y2={chartHeight}
-              stroke="#374151"
-              strokeWidth={1}
-            />
+            <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#374151" strokeWidth={1} />
             
-            {/* Y-axis ticks and labels */}
             {generateYAxisTicks(maxValue).map((tick) => (
               <g key={tick} transform={`translate(0, ${yScale(tick)})`}>
                 <line x1={-5} y1={0} x2={chartWidth} y2={0} stroke="#374151" strokeOpacity={0.1} />
@@ -263,41 +212,19 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
               </g>
             ))}
             
-            {/* Box plots and current week dots */}
             {data.map((d, i) => {
               const x = (i * (chartWidth / 7)) + (chartWidth / 14);
               
               return (
                 <g key={d.day} transform={`translate(${x}, 0)`}>
-                  {/* Box plot */}
                   {d.count > 0 && (
                     <>
-                      {/* Vertical line (whisker) */}
-                      <line
-                        x1={0}
-                        y1={yScale(d.whiskerMax)}
-                        x2={0}
-                        y2={yScale(d.whiskerMin)}
-                        stroke="#374151"
-                        strokeWidth={1}
-                      />
-                      
-                      {/* Whisker ends */}
-                      <line
-                        x1={-10}
-                        y1={yScale(d.whiskerMax)}
-                        x2={10}
-                        y2={yScale(d.whiskerMax)}
-                        stroke="#374151"
-                        strokeWidth={1}
-                      />
-                      <line
-                        x1={-10}
-                        y1={yScale(d.whiskerMin)}
-                        x2={10}
-                        y2={yScale(d.whiskerMin)}
-                        stroke="#374151"
-                        strokeWidth={1}
+                      {/* Max value star */}
+                      <path
+                        d="M 0,-8 L 2,-2 8,-2 4,2 6,8 0,4 -6,8 -4,2 -8,-2 -2,-2 Z"
+                        transform={`translate(0,${yScale(d.maxValue)})`}
+                        fill="#374151"
+                        stroke="none"
                       />
                       
                       {/* Box (±1 STD) */}
@@ -323,22 +250,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
                     </>
                   )}
                   
-                  {/* Current week dot
-                  {d.current !== null && (
-                    <path
-                      d={`M ${0} ${yScale(d.current) - 10} 
-                          L ${8} ${yScale(d.current)} 
-                          L ${0} ${yScale(d.current) + 10} 
-                          L ${-8} ${yScale(d.current)} Z`}
-                      fill="#ef4444"
-                      stroke="black"
-                      strokeWidth={2}
-                    />
-                    
-                  )} */}
-                  
-                  
-                  {/* X-axis label */}
                   <text
                     x={0}
                     y={chartHeight + 45}
@@ -350,14 +261,13 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
                 </g>
               );
             })}
-            {/* Connecting line for current week values */}
+
             <path
               d={data.reduce((path, d, i) => {
                 const x = (i * (chartWidth / 7)) + (chartWidth / 14);
                 const today = new Date();
                 const dayIndex = today.getDay();
                 
-                // Only include points up to current day of week
                 if (d.current === null || i > dayIndex) return path;
                 
                 return path + `${path ? 'L' : 'M'} ${x} ${yScale(d.current)}`;
@@ -367,13 +277,11 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
               fill="none"
             />
 
-            {/* Current week dots (rendered last to be on top) */}
             {data.map((d, i) => {
               const x = (i * (chartWidth / 7)) + (chartWidth / 14);
               const today = new Date();
               const dayIndex = today.getDay();
               
-              // Only show dots up to current day of week
               if (d.current === null || i > dayIndex) return null;
               
               return (
@@ -389,8 +297,6 @@ const WeeklyStats = ({ drinkData, selectedDate }) => {
                 />
               );
             })}
-
-
           </g>
         </svg>
       </div>
