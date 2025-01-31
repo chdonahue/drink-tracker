@@ -3,10 +3,12 @@ import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, R
 import _ from 'lodash';
 
 const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
-  const selectedYear = selectedDate ? new Date(selectedDate).getFullYear() : new Date().getFullYear();
+  // Use local timezone when parsing the selected date
+  const selectedYear = selectedDate ? 
+    new Date(selectedDate + 'T00:00:00').getFullYear() : 
+    new Date().getFullYear();
 
   const calculateMonthlyAverages = () => {
-    // Initialize array for all months
     const allMonths = Array.from({ length: 12 }, (_, i) => {
       return {
         month: new Date(0, i).toLocaleString('default', { month: 'short' }),
@@ -14,26 +16,20 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
       };
     });
 
-    // Group drinks by year and month
     const groupedByMonth = _.groupBy(Object.entries(drinkData), ([date]) => {
-      const [year, month] = date.split('-');
+      const dateObj = new Date(date + 'T00:00:00');
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       return `${year}-${month}`;
     });
 
-    // Calculate average drinks per week for each month
     const monthlyAverages = Object.entries(groupedByMonth).map(([yearMonth, entries]) => {
       const [year, month] = yearMonth.split('-');
       
-      // Only process data for the selected year
       if (parseInt(year) !== selectedYear) return null;
       
-      // Sum all drinks in the month
       const totalDrinks = _.sumBy(entries, ([_, count]) => count);
-      
-      // Count number of days with data
       const daysWithData = entries.length;
-      
-      // Calculate weekly average
       const averagePerWeek = (totalDrinks / daysWithData) * 7;
 
       return {
@@ -43,17 +39,15 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
       };
     });
 
-    // Merge calculated averages with the base array of all months
     const calculatedAverages = monthlyAverages
       .filter(item => item !== null)
       .reduce((acc, item) => {
         const [year, month] = item.yearMonth.split('-');
-        const monthIndex = parseInt(month) - 1;  // Month is 1-based, convert to 0-based
+        const monthIndex = parseInt(month) - 1;
         acc[monthIndex] = item;
         return acc;
       }, {});
 
-    // Return array with all months, using calculated values where available
     return allMonths.map((baseMonth, index) => {
       const calculatedValue = calculatedAverages[index];
       return {
@@ -66,7 +60,7 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
   const data = calculateMonthlyAverages();
   const maxValue = Math.max(...data.map(d => d.average || 0));
   const yAxisMax = Math.ceil(maxValue * 1.05);
-  const yAxisTicks = _.range(0, yAxisMax + 3, 3);  // Generate ticks from 0 to max in steps of 3
+  const yAxisTicks = _.range(0, yAxisMax + 3, 3);
 
   return (
     <div className="bg-white p-4 w-full">
@@ -75,54 +69,54 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
       </h2>
       <div className="w-full" style={{ height: "300px" }}>
         <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart
-          data={data}
-          margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
-          height={300}
-        >
-          <XAxis 
-            dataKey="month" 
-            tick={{ fontSize: 14 }}
-            padding={{ left: 30, right: 30 }}
-            interval={0}
-            angle={-90}
-            dy={10}
-            dx={-5}
-            textAnchor="end"
-          />
-          <YAxis
-            tick={{ fontSize: 14 }}
-            label={{ 
-              value: 'Drinks per Week', 
-              angle: -90, 
-              position: 'insideLeft',
-              style: { fontSize: 14 },
-              dy: 40
-            }}
-            domain={[0, yAxisMax]}
-            allowDataOverflow={false}
-            ticks={yAxisTicks}
-          />
-          {weeklyGoal !== null && (
-            <ReferenceLine 
-              y={weeklyGoal} 
-              stroke="#4b5563" 
-              strokeDasharray="3 3"
-              label={{
-                value: `Goal: ${weeklyGoal}`,
-                position: 'right',
-                fill: '#4b5563'
-              }}
+          <ComposedChart
+            data={data}
+            margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
+            height={300}
+          >
+            <XAxis 
+              dataKey="month" 
+              tick={{ fontSize: 14 }}
+              padding={{ left: 30, right: 30 }}
+              interval={0}
+              angle={-90}
+              dy={10}
+              dx={-5}
+              textAnchor="end"
             />
-          )}
-          <Bar
-            dataKey="average"
-            name="average-bar"
-            fill="#e5e7eb"
-            stroke="#000000"
-            strokeWidth={1}
-            radius={[4, 4, 0, 0]}
-          />
+            <YAxis
+              tick={{ fontSize: 14 }}
+              label={{ 
+                value: 'Drinks per Week', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: 14 },
+                dy: 40
+              }}
+              domain={[0, yAxisMax]}
+              allowDataOverflow={false}
+              ticks={yAxisTicks}
+            />
+            {weeklyGoal !== null && (
+              <ReferenceLine 
+                y={weeklyGoal} 
+                stroke="#4b5563" 
+                strokeDasharray="3 3"
+                label={{
+                  value: `Goal: ${weeklyGoal}`,
+                  position: 'right',
+                  fill: '#4b5563'
+                }}
+              />
+            )}
+            <Bar
+              dataKey="average"
+              name="average-bar"
+              fill="#e5e7eb"
+              stroke="#000000"
+              strokeWidth={1}
+              radius={[4, 4, 0, 0]}
+            />
             <Line 
               type="linear" 
               dataKey="average" 
