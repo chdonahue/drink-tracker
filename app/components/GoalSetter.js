@@ -47,7 +47,7 @@ const GoalSetter = ({ value, onChange }) => {
     <>
       <button
         onClick={handleClick}
-        className="px-3 py-1.5 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 transition-colors"
+        className="px-3 py-1.5 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition-colors"
       >
         <span className="text-base font-medium">
           {value === null ? '—' : value}
@@ -62,7 +62,7 @@ const GoalSetter = ({ value, onChange }) => {
             setIsAdjusting(false);
             }}
             onClose={() => setIsAdjusting(false)}
-            customClassName="bg-blue-500"
+            customClassName="bg-green-500"
         />
         )}
     </>
