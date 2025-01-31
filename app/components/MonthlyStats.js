@@ -1,8 +1,8 @@
 import React from 'react';
-import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar } from 'recharts';
+import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, ReferenceLine } from 'recharts';
 import _ from 'lodash';
 
-const MonthlyStats = ({ drinkData, selectedDate }) => {
+const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
   const selectedYear = selectedDate ? new Date(selectedDate).getFullYear() : new Date().getFullYear();
 
   const calculateMonthlyAverages = () => {
@@ -75,42 +75,54 @@ const MonthlyStats = ({ drinkData, selectedDate }) => {
       </h2>
       <div className="w-full" style={{ height: "300px" }}>
         <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart
-            data={data}
-            margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
-            height={300}
-          >
-            <XAxis 
-              dataKey="month" 
-              tick={{ fontSize: 14 }}
-              padding={{ left: 30, right: 30 }}
-              interval={0}
-              angle={-90}
-              dy={10}
-              dx={-5}
-              textAnchor="end"
-            />
-            <YAxis
-              tick={{ fontSize: 14 }}
-              label={{ 
-                value: 'Drinks per Week', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { fontSize: 14 },
-                dy: 40  // Add dy to center the label
+        <ComposedChart
+          data={data}
+          margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
+          height={300}
+        >
+          <XAxis 
+            dataKey="month" 
+            tick={{ fontSize: 14 }}
+            padding={{ left: 30, right: 30 }}
+            interval={0}
+            angle={-90}
+            dy={10}
+            dx={-5}
+            textAnchor="end"
+          />
+          <YAxis
+            tick={{ fontSize: 14 }}
+            label={{ 
+              value: 'Drinks per Week', 
+              angle: -90, 
+              position: 'insideLeft',
+              style: { fontSize: 14 },
+              dy: 40
+            }}
+            domain={[0, yAxisMax]}
+            allowDataOverflow={false}
+            ticks={yAxisTicks}
+          />
+          {weeklyGoal !== null && (
+            <ReferenceLine 
+              y={weeklyGoal} 
+              stroke="#4b5563" 
+              strokeDasharray="3 3"
+              label={{
+                value: `Goal: ${weeklyGoal}`,
+                position: 'right',
+                fill: '#4b5563'
               }}
-              domain={[0, yAxisMax]}
-              allowDataOverflow={false}
-              ticks={yAxisTicks}
             />
-            <Bar
-              dataKey="average"
-              name="average-bar"
-              fill="#e5e7eb"
-              stroke="#000000"
-              strokeWidth={1}
-              radius={[4, 4, 0, 0]}
-            />
+          )}
+          <Bar
+            dataKey="average"
+            name="average-bar"
+            fill="#e5e7eb"
+            stroke="#000000"
+            strokeWidth={1}
+            radius={[4, 4, 0, 0]}
+          />
             <Line 
               type="linear" 
               dataKey="average" 

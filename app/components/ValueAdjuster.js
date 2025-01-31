@@ -3,7 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import getColorForCount from '../utils/colorMapping';
 
-const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
+const ValueAdjuster = ({ 
+  initialValue = null, 
+  onValueChange, 
+  onClose,
+  customClassName = '' // Add default empty string
+}) => {
     const [currentValue, setCurrentValue] = useState(initialValue);
     const [touchStart, setTouchStart] = useState(null);
     const [startValue, setStartValue] = useState(0);
@@ -109,7 +114,7 @@ const ValueAdjuster = ({ initialValue = null, onValueChange, onClose }) => {
       onClick={onClose}
     >
       <button 
-        className={`w-64 h-64 rounded-xl ${isClearing ? 'bg-gray-500' : getColorForCount(currentValue)} 
+        className={`w-64 h-64 rounded-xl ${customClassName || (isClearing ? 'bg-gray-500' : getColorForCount(currentValue))} 
           flex flex-col items-center justify-center transition-colors duration-200`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
