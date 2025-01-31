@@ -28,8 +28,11 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
       
       if (parseInt(year) !== selectedYear) return null;
       
-      const totalDrinks = _.sumBy(entries, ([_, count]) => count);
       const daysWithData = entries.length;
+      // Only calculate average if we have at least 5 days of data
+      if (daysWithData < 5) return null;
+      
+      const totalDrinks = _.sumBy(entries, ([_, count]) => count);
       const averagePerWeek = (totalDrinks / daysWithData) * 7;
 
       return {
@@ -58,7 +61,7 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
   };
 
   const data = calculateMonthlyAverages();
-  const maxValue = Math.max(...data.map(d => d.average || 0));
+  const maxValue = Math.max(...data.map(d => d.average || 0 || 1.05*weeklyGoal));
   const yAxisMax = Math.ceil(maxValue * 1.05);
   const yAxisTicks = _.range(0, yAxisMax + 3, 3);
 
@@ -73,6 +76,7 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
             data={data}
             margin={{ top: 20, right: 0, left: 0, bottom: 70 }}
             height={300}
+            legend={{ verticalAlign: 'top', height: 36 }}
           >
             <XAxis 
               dataKey="month" 
@@ -102,6 +106,7 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
                 y={weeklyGoal} 
                 stroke="#4b5563" 
                 strokeDasharray="3 3"
+                name="Weekly Goal"
                 label={{
                   value: `Goal: ${weeklyGoal}`,
                   position: 'right',
@@ -120,7 +125,7 @@ const MonthlyStats = ({ drinkData, selectedDate, weeklyGoal }) => {
             <Line 
               type="linear" 
               dataKey="average" 
-              name="Weekly Average"
+              name="Average Drinks per Week"
               stroke="#ef4444" 
               strokeWidth={3}
               dot={{ r: 6 }}
