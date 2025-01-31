@@ -8,10 +8,12 @@ import ShareButtons from './components/ShareButtons';
 import WeeklyStats from './components/WeeklyStats';
 import MonthlyStats from './components/MonthlyStats';
 import TabGroup from './components/TabGroup';
+import GoalSetter from './components/GoalSetter';
 
 export default function Home() {
   const { user } = useAuth();
   const [drinkData, setDrinkData] = useState({});
+  const [weeklyGoal, setWeeklyGoal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [activeTab, setActiveTab] = useState('weekly');
@@ -19,8 +21,44 @@ export default function Home() {
   useEffect(() => {
     if (user) {
       fetchDrinkData();
+      fetchWeeklyGoal();
     }
   }, [user]);
+
+  const fetchWeeklyGoal = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('weekly_goal')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
+      setWeeklyGoal(data?.weekly_goal ?? null);
+    } catch (error) {
+      console.error('Error fetching weekly goal:', error);
+    }
+  };
+
+  const handleGoalChange = async (newGoal) => {
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({ 
+          user_id: user.id,
+          weekly_goal: newGoal
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+      setWeeklyGoal(newGoal);
+    } catch (error) {
+      console.error('Error saving weekly goal:', error);
+      alert('Failed to save weekly goal. Please try again.');
+      fetchWeeklyGoal();  // Refresh from database
+    }
+  };
 
   const fetchDrinkData = async () => {
     try {
@@ -84,7 +122,6 @@ export default function Home() {
         if (error) throw error;
       }
     } catch (error) {
-      // If database update fails, revert the optimistic update
       console.error('Error saving drink count:', error);
       alert('Failed to save drink count. Please try again.');
       fetchDrinkData();  // Refresh from database
@@ -104,7 +141,16 @@ export default function Home() {
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-center">Drink Tracker</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Drink Tracker</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold">Weekly Goal:</span>
+              <GoalSetter 
+                value={weeklyGoal}
+                onChange={handleGoalChange}
+              />
+            </div>
+          </div>
           
           <div className="grid grid-cols-3 w-full gap-4">
             <div className="col-span-2">
@@ -146,11 +192,13 @@ export default function Home() {
             <WeeklyStats 
               drinkData={drinkData} 
               selectedDate={selectedDate}
+              weeklyGoal={weeklyGoal}
             />
           ) : (
             <MonthlyStats 
               drinkData={drinkData}
               selectedDate={selectedDate}
+              weeklyGoal={weeklyGoal}
             />
           )}
         </div>
